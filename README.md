@@ -50,7 +50,7 @@ We bypassed the node's parameter binding engine entirely. We now construct the r
 
 _Example of the fixed UPDATE query:_
 
-```
+```js
 const d = msg.payload;
 const fn = d.first_name || '';
 const ln = d.last_name || '';
@@ -71,3 +71,61 @@ This ensures that data is consistently written to the database exactly as intend
 - `node-red-contrib-queued-sqlite-fix` (Database handling)
     
 - A running instance of the Python embedding server on port 5000.
+
+
+## System Updates: Facial Recognition Logic & UI Enhancements
+
+This document outlines the recent architectural changes made to the Face Registration System, transforming it from a simple data logger into a smart, production-ready moderation pipeline.
+
+## 1. Smart Duplicate Detection (The Math Behind the Magic)
+
+We implemented an interception layer before data hits the database to prevent saving multiple entries of the same person.
+
+**The Challenge:** Initially, comparing new faces against the database using Euclidean Distance failed to recognize the same person across different photos. This occurred because the Python backend (using DeepFace/FaceNet) normalizes embeddings in a way that relies on the angle between vectors, not the absolute distance.
+
+**The Solution:**
+
+We replicated NumPy's mathematical logic entirely within a Node-RED JavaScript function. We replaced the Euclidean calculation with **Cosine Distance**:
+
+```js
+Cosine Distance = 1 - (A · B) / (||A|| * ||B||)
+```
+
+By querying the existing SQLite embeddings and running this calculation against incoming camera frames with a strict `THRESHOLD = 0.40`, Node-RED can accurately identify duplicate faces in milliseconds without needing to make secondary API calls to the Python backend. Known faces are currently branched off for further automation (e.g., triggering alerts), while only truly unknown faces proceed to the database.
+
+## 2. Advanced Status Workflow & Data Lifecycle
+
+The application now features a strict moderation pipeline with 4 specific states. The Vue.js frontend dynamically manipulates the SQLite database based on these states to keep the system clean.
+
+- **`pending`**: The default state for new faces. These are the _only_ records that appear in the main Registry UI for manual review.
+    
+- **`identified`**: The face belongs to a known, benign individual. Once marked, the record updates and instantly disappears from the pending queue.
+    
+- **`blacklisted`**: The face belongs to a banned individual. The embedding is permanently saved in the database (so the Cosine Distance check can catch them if they return), and they are highlighted in purple across the UI.
+    
+- **`rejected`**: Used for false positives, blurry images, or bad data. **Action:** Marking a face as rejected triggers a hard `DELETE FROM persons` query, scrubbing the garbage data entirely from the SQLite database.
+    
+
+## 3. UI/UX Architecture Overhaul
+
+The Dashboard templates have been upgraded to provide a native-app experience, bypassing the default Node-RED Dashboard margins and layouts.
+
+- **Immersive Fullscreen:** Both the Registry and the Records Table now utilize `position: fixed` CSS to consume the entire viewport, creating a distraction-free moderation environment.
+    
+- **Seamless Navigation:** Built-in routing via Vue's `$router.push()` (with fallback to `window.location`) allows instant switching between the Registry and the Table views without reloading the browser.
+    
+- **Interactive Modals:** The "All Records" table is now fully interactive. Clicking any table row opens a CSS-blurred modal overlay displaying the high-resolution face image linked to that record. We also bound global EventListeners to Vue's lifecycle hooks, allowing users to quickly dismiss the modal by pressing the `ESC` key.
+
+## 4. Zero-Touch Deployment & Hypervisor Boot Sequence
+
+We moved the Python backend (`api.py`) directly into the Node-RED project directory. To ensure the system is truly portable and resilient, Node-RED now acts as a hypervisor that provisions its own dependencies on startup using a chained Windows `cmd` command.
+
+**The Boot Sequence:**
+
+1. **PM2 Auto-Provisioning:** The system checks if PM2 exists (`where pm2`). If missing on a new machine, it silently installs it globally via `npm`.
+    
+2. **Model Pre-fetching:** DeepFace normally downloads its weights (`facenet_weights.h5`) on the first run. This often causes API timeouts or fails due to network hiccups. We bypass this by checking the `%USERPROFILE%\.deepface\weights\` directory. If the model is missing, we use native Windows `curl` to fetch it directly from the GitHub releases before Python even starts.
+    
+3. **Python Dependencies:** It navigates to the project folder, looks for `requirements.txt` (which includes `Flask` and `deepface`), and runs `pip install` to resolve any missing packages.
+    
+4. **Daemonizing:** Finally, it starts or restarts `api.py` as a PM2 background daemon (`face-api`), ensuring the Flask server is always up and listening on port 5000.
