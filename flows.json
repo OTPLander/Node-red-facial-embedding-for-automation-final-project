@@ -1,0 +1,806 @@
+[
+    {
+        "id": "b31915b6cc494042",
+        "type": "tab",
+        "label": "Flujo 4",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "686b413b27a3785d",
+        "type": "sqliteQueuedDb",
+        "db": "${USERPROFILE}\\saved_faces\\face_data.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "e5503fd55ff4511a",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": false,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "none",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "ui_theme_dark",
+        "type": "ui-theme",
+        "name": "Dark Theme",
+        "colors": {
+            "surface": "#0a0e1a",
+            "primary": "#7af4ff",
+            "bgPage": "#070b16",
+            "groupBg": "#0a0e1a",
+            "groupOutline": false
+        },
+        "sizes": {
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "6px"
+        }
+    },
+    {
+        "id": "face_register_page",
+        "type": "ui-page",
+        "name": "Registry",
+        "ui": "e5503fd55ff4511a",
+        "path": "/registry",
+        "icon": "mdi-face-recognition",
+        "layout": "grid",
+        "theme": "ui_theme_dark",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 4,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "face_table_page",
+        "type": "ui-page",
+        "name": "All Records",
+        "ui": "e5503fd55ff4511a",
+        "path": "/all-records",
+        "icon": "mdi-table",
+        "layout": "grid",
+        "theme": "ui_theme_dark",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 5,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "face_register_group",
+        "type": "ui-group",
+        "name": "Face Registration",
+        "page": "face_register_page",
+        "width": "24",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "face_table_group",
+        "type": "ui-group",
+        "name": "Records Table",
+        "page": "face_table_page",
+        "width": "24",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "3aa4c2141cf959ac",
+        "type": "inject",
+        "z": "b31915b6cc494042",
+        "name": "1. Initialize Database",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 430,
+        "y": 220,
+        "wires": [
+            [
+                "2079967e09a28244"
+            ]
+        ]
+    },
+    {
+        "id": "2079967e09a28244",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Ensure Table + Clean Nulls",
+        "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = `CREATE TABLE IF NOT EXISTS persons (\n    id         INTEGER PRIMARY KEY AUTOINCREMENT,\n    first_name TEXT,\n    last_name  TEXT,\n    photo_path TEXT,\n    embedding  TEXT,\n    status     TEXT\n);\nDELETE FROM persons\nWHERE first_name IS NULL\n  AND last_name  IS NULL\n  AND photo_path IS NULL;`;\nreturn msg;",
+        "outputs": 1,
+        "x": 650,
+        "y": 220,
+        "wires": [
+            [
+                "d265777c9b809965"
+            ]
+        ]
+    },
+    {
+        "id": "d265777c9b809965",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Local Database",
+        "x": 890,
+        "y": 220,
+        "wires": [
+            [
+                "b7a0caa963dc0433"
+            ]
+        ]
+    },
+    {
+        "id": "b7a0caa963dc0433",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "DB Response",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c386934a99953c15",
+        "type": "inject",
+        "z": "b31915b6cc494042",
+        "name": "2. Simulate Photo Arrival",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 390,
+        "y": 340,
+        "wires": [
+            [
+                "d2a515463e182b8c"
+            ]
+        ]
+    },
+    {
+        "id": "ae5fe517035956e1",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Extract Bytes for Python",
+        "func": "let buf = msg.payload;\nlet byteDict = {};\nfor(let i = 0; i < buf.length; i++) {\n    byteDict[i] = buf[i];\n}\nmsg.payload = { image_bytes: byteDict };\nreturn msg;",
+        "outputs": 1,
+        "x": 910,
+        "y": 340,
+        "wires": [
+            [
+                "1ce8cc543c06cadc"
+            ]
+        ]
+    },
+    {
+        "id": "1ce8cc543c06cadc",
+        "type": "http request",
+        "z": "b31915b6cc494042",
+        "name": "POST /embed_and_reconstruct",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5000/embed_and_reconstruct",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "Content-Type",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 430,
+        "y": 440,
+        "wires": [
+            [
+                "001daa9beea58063"
+            ]
+        ]
+    },
+    {
+        "id": "001daa9beea58063",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Prepare SQL and File",
+        "func": "if (msg.payload.status === 'success') {\n\n    let embeddingStr = JSON.stringify(msg.payload.embedding);\n\n    let base64Data = msg.payload.imagen_base64.split(',')[1];\n    let imageBuffer = Buffer.from(base64Data, 'base64');\n\n    let timestamp = Date.now();\n    let filename  = 'pending_face_' + timestamp + '.jpg';\n    \n    let userDir = env.get(\"USERPROFILE\") || \"C:\";\n    let fullPath  = userDir + '/saved_faces/' + filename;\n\n    let msgFile = {\n        filename: fullPath,\n        payload:  imageBuffer\n    };\n\n    let query = \"INSERT INTO persons (first_name, last_name, photo_path, embedding, status) VALUES ('', '', '\" + fullPath.replace(/\\\\/g, '/') + \"', '\" + embeddingStr + \"', 'pending')\";\n\n    let msgSQL = {\n        topic:  query,\n        database: userDir + \"/saved_faces/face_data.db\"\n    };\n\n    return [msgFile, msgSQL];\n\n} else {\n    node.error('Python error: ' + msg.payload.error);\n    return [null, null];\n}",
+        "outputs": 2,
+        "x": 680,
+        "y": 440,
+        "wires": [
+            [
+                "4eab7624d190103e",
+                "a6525f423972ee46"
+            ],
+            [
+                "1be746a37ebb9182",
+                "2c81241b3b7a13c9"
+            ]
+        ]
+    },
+    {
+        "id": "4eab7624d190103e",
+        "type": "file",
+        "z": "b31915b6cc494042",
+        "name": "Save Photo .jpg",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 970,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a6525f423972ee46",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "File Saved",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "filename",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "1be746a37ebb9182",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Insert New Face",
+        "x": 970,
+        "y": 520,
+        "wires": [
+            [
+                "2c81241b3b7a13c9"
+            ]
+        ]
+    },
+    {
+        "id": "2c81241b3b7a13c9",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "SQL Executed",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1390,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "8a6bdf124879e6ca",
+        "type": "ui-template",
+        "z": "b31915b6cc494042",
+        "group": "face_register_group",
+        "name": "Face Registration System",
+        "order": 2,
+        "width": "24",
+        "height": "14",
+        "head": "",
+        "format": "<template>\n  <div class=\"face-registry\">\n    <div class=\"header\">\n      <div class=\"header-left\">\n        <span class=\"badge\" v-if=\"faces.length > 0\">{{ currentIndex + 1 }} / {{ faces.length }}</span>\n        <span class=\"badge empty\" v-else>No records</span>\n      </div>\n      <h1 class=\"title\">FACE <span>REGISTRY</span></h1>\n      <div class=\"header-right\">\n        <span class=\"status-dot\" :class=\"faces[currentIndex] && faces[currentIndex].status\"></span>\n        <span class=\"status-label\">{{ faces[currentIndex] ? faces[currentIndex].status : '—' }}</span>\n      </div>\n    </div>\n    <div class=\"main\" v-if=\"faces.length > 0\">\n      <div class=\"image-panel\">\n        <button class=\"nav-btn\" @click=\"prev\" :disabled=\"currentIndex === 0\">&#8592;</button>\n        <div class=\"image-wrapper\">\n          <img v-if=\"faces[currentIndex].photo_path\" :src=\"'/faces/' + getFilename(faces[currentIndex].photo_path)\"\n               @error=\"onImgError($event)\"\n               class=\"face-img\" />\n          <div class=\"img-overlay\" :class=\"faces[currentIndex].status\">{{ faces[currentIndex].status }}</div>\n        </div>\n        <button class=\"nav-btn\" @click=\"next\" :disabled=\"currentIndex === faces.length - 1\">&#8594;</button>\n      </div>\n      <div class=\"form-panel\">\n        <div class=\"field-row\">\n          <div class=\"field\">\n            <label>FIRST NAME</label>\n            <input v-model=\"form.first_name\" placeholder=\"Enter first name\" />\n          </div>\n          <div class=\"field\">\n            <label>LAST NAME</label>\n            <input v-model=\"form.last_name\" placeholder=\"Enter last name\" />\n          </div>\n        </div>\n        <div class=\"field\">\n          <label>RECORD ID</label>\n          <input :value=\"faces[currentIndex].id\" disabled class=\"disabled-input\" />\n        </div>\n        <div class=\"field\">\n          <label>PHOTO PATH</label>\n          <input :value=\"faces[currentIndex].photo_path\" disabled class=\"disabled-input path-input\" />\n        </div>\n        <div class=\"field\">\n          <label>SET STATUS</label>\n          <div class=\"status-selector\">\n            <button v-for=\"s in statuses\" :key=\"s\"\n                    class=\"status-btn\"\n                    :class=\"{ active: form.status === s, [s]: true }\"\n                    @click=\"form.status = s\">{{ s }}\n            </button>\n          </div>\n        </div>\n        <div class=\"actions\">\n          <button class=\"btn-reset\" @click=\"resetForm\">RESET</button>\n          <button class=\"btn-save\" @click=\"save\" :disabled=\"saving\">\n            <span v-if=\"saving\">SAVING...</span>\n            <span v-else>SAVE RECORD</span>\n          </button>\n        </div>\n        <div class=\"toast\" :class=\"{ visible: toast.show, [toast.type]: true }\">{{ toast.message }}</div>\n      </div>\n    </div>\n    <div class=\"empty-state\" v-else>\n      <div class=\"empty-icon\">&#9711;</div>\n      <p>No pending faces found in the database.</p>\n      <button class=\"btn-save\" @click=\"loadFaces\">REFRESH</button>\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return {\n      faces: [],\n      currentIndex: 0,\n      statuses: ['pending', 'identified', 'rejected', 'verified'],\n      form: { first_name: '', last_name: '', status: 'pending' },\n      saving: false,\n      toast: { show: false, message: '', type: 'success' }\n    };\n  },\n  watch: {\n    msg(newMsg) {\n      if (!newMsg) return;\n      if (newMsg.topic === 'faces_data') {\n        this.faces = newMsg.payload || [];\n        this.currentIndex = 0;\n        this.syncForm();\n        this.saving = false;\n      } else if (newMsg.topic === 'save_result') {\n        this.saving = false;\n        if (newMsg.payload && newMsg.payload.success) {\n          this.faces[this.currentIndex].first_name = this.form.first_name;\n          this.faces[this.currentIndex].last_name  = this.form.last_name;\n          this.faces[this.currentIndex].status     = this.form.status;\n          this.showToast('Record saved successfully!', 'success');\n        } else {\n          this.showToast('Error saving record.', 'error');\n        }\n      }\n    }\n  },\n  mounted() {\n    this.loadFaces();\n  },\n  methods: {\n    loadFaces() { this.send({ topic: 'load_faces', payload: null }); },\n    prev() { if (this.currentIndex > 0) { this.currentIndex--; this.syncForm(); } },\n    next() { if (this.currentIndex < this.faces.length - 1) { this.currentIndex++; this.syncForm(); } },\n    syncForm() {\n      const f = this.faces[this.currentIndex];\n      if (f) {\n        this.form.first_name = f.first_name || '';\n        this.form.last_name  = f.last_name  || '';\n        this.form.status     = f.status     || 'pending';\n      }\n    },\n    save() {\n      const face = this.faces[this.currentIndex];\n      this.saving = true;\n      this.send({ topic: 'save_face', payload: { id: face.id, first_name: this.form.first_name, last_name: this.form.last_name, status: this.form.status } });\n    },\n    resetForm() { this.syncForm(); },\n    getFilename(path) {\n      if (!path) return '';\n      return path.replace(/\\\\/g, '/').split('/').pop();\n    },\n    onImgError(e) {\n      e.target.src = 'data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\"><rect fill=\"%23111\" width=\"200\" height=\"200\"/><text x=\"50%\" y=\"50%\" fill=\"%23555\" font-size=\"14\" text-anchor=\"middle\" dy=\".3em\">NO IMAGE</text></svg>';\n    },\n    showToast(message, type) {\n      this.toast = { show: true, message, type };\n      setTimeout(() => { this.toast.show = false; }, 3000);\n    }\n  }\n};\n</script>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');\n.face-registry * { box-sizing: border-box; margin: 0; padding: 0; }\n.face-registry { background: #0a0a0f; color: #c8d8e8; font-family: 'Exo 2', sans-serif; min-height: 480px; padding: 20px 24px; border: 1px solid #1a2535; border-radius: 4px; position: relative; overflow: hidden; }\n.face-registry::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, transparent, transparent 39px, #111827 40px); pointer-events: none; opacity: 0.25; }\n.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #1e2d40; }\n.title { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #e0eaf5; }\n.title span { color: #38bdf8; }\n.badge { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; background: #0f2035; border: 1px solid #1e3a55; color: #38bdf8; padding: 3px 10px; border-radius: 2px; letter-spacing: 0.1em; }\n.badge.empty { color: #555; border-color: #222; }\n.header-right { display: flex; align-items: center; gap: 8px; }\n.status-dot { width: 9px; height: 9px; border-radius: 50%; background: #555; }\n.status-dot.pending { background: #f59e0b; box-shadow: 0 0 8px #f59e0b88; }\n.status-dot.identified { background: #38bdf8; box-shadow: 0 0 8px #38bdf888; }\n.status-dot.verified { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }\n.status-dot.rejected { background: #ef4444; box-shadow: 0 0 8px #ef444488; }\n.status-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #6b8aaa; }\n.main { display: flex; gap: 28px; align-items: flex-start; }\n.image-panel { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }\n.image-wrapper { position: relative; width: 200px; height: 220px; border: 1px solid #1e2d40; border-radius: 3px; overflow: hidden; background: #060b12; }\n.face-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: contrast(1.05) saturate(0.9); transition: filter 0.3s; }\n.image-wrapper:hover .face-img { filter: contrast(1.1) saturate(1); }\n.img-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 5px 0; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; background: rgba(0,0,0,0.72); color: #555; }\n.img-overlay.pending { color: #f59e0b; }\n.img-overlay.identified { color: #38bdf8; }\n.img-overlay.verified { color: #22c55e; }\n.img-overlay.rejected { color: #ef4444; }\n.nav-btn { background: #0f1e2e; border: 1px solid #1e3a55; color: #38bdf8; width: 34px; height: 34px; border-radius: 3px; font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }\n.nav-btn:hover:not(:disabled) { background: #162840; transform: scale(1.08); }\n.nav-btn:disabled { opacity: 0.2; cursor: default; }\n.form-panel { flex: 1; display: flex; flex-direction: column; gap: 14px; }\n.field-row { display: flex; gap: 14px; }\n.field { display: flex; flex-direction: column; gap: 5px; flex: 1; }\n.field label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; color: #3a5a7a; text-transform: uppercase; }\n.field input { background: #060d16; border: 1px solid #1a2e44; color: #c8d8e8; padding: 9px 12px; font-family: 'Exo 2', sans-serif; font-size: 0.88rem; border-radius: 2px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }\n.field input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf820; }\n.disabled-input { opacity: 0.4; cursor: not-allowed; }\n.path-input { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; }\n.status-selector { display: flex; gap: 8px; flex-wrap: wrap; }\n.status-btn { padding: 6px 14px; border-radius: 2px; border: 1px solid #1e2d40; background: #060d16; color: #4a6a8a; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }\n.status-btn:hover { border-color: #38bdf8; color: #38bdf8; }\n.status-btn.active.pending { background: #2d1e00; border-color: #f59e0b; color: #f59e0b; }\n.status-btn.active.identified { background: #002030; border-color: #38bdf8; color: #38bdf8; }\n.status-btn.active.verified { background: #002010; border-color: #22c55e; color: #22c55e; }\n.status-btn.active.rejected { background: #200010; border-color: #ef4444; color: #ef4444; }\n.actions { display: flex; gap: 12px; margin-top: 4px; }\n.btn-save { flex: 1; padding: 11px; background: #38bdf8; color: #050d16; font-family: 'Exo 2', sans-serif; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; border: none; border-radius: 2px; cursor: pointer; transition: background 0.2s, transform 0.1s; }\n.btn-save:hover:not(:disabled) { background: #7dd3f8; transform: translateY(-1px); }\n.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }\n.btn-reset { padding: 11px 20px; background: transparent; border: 1px solid #1e3a55; color: #4a6a8a; font-family: 'Exo 2', sans-serif; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; border-radius: 2px; cursor: pointer; transition: all 0.2s; }\n.btn-reset:hover { border-color: #38bdf8; color: #38bdf8; }\n.toast { position: absolute; bottom: 20px; right: 24px; padding: 9px 18px; border-radius: 2px; font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }\n.toast.visible { opacity: 1; transform: translateY(0); }\n.toast.success { background: #002010; border: 1px solid #22c55e; color: #22c55e; }\n.toast.error { background: #200010; border: 1px solid #ef4444; color: #ef4444; }\n.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 300px; color: #2a4060; }\n.empty-icon { font-size: 3rem; }\n.empty-state p { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.1em; }\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 550,
+        "y": 640,
+        "wires": [
+            [
+                "58e521646670c8fb"
+            ]
+        ]
+    },
+    {
+        "id": "58e521646670c8fb",
+        "type": "switch",
+        "z": "b31915b6cc494042",
+        "name": "Route by Topic",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "load_faces",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "save_face",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 770,
+        "y": 640,
+        "wires": [
+            [
+                "2362aaf9df236738"
+            ],
+            [
+                "809e1132288d19f5"
+            ]
+        ]
+    },
+    {
+        "id": "2362aaf9df236738",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Build SELECT Query",
+        "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = 'SELECT id, first_name, last_name, photo_path, status FROM persons ORDER BY id ASC';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 600,
+        "wires": [
+            [
+                "7d9fc92e9a40898d"
+            ]
+        ]
+    },
+    {
+        "id": "7d9fc92e9a40898d",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Query All Faces",
+        "x": 1170,
+        "y": 600,
+        "wires": [
+            [
+                "1952005aed97c097"
+            ]
+        ]
+    },
+    {
+        "id": "1952005aed97c097",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Send faces_data to UI",
+        "func": "msg.topic = 'faces_data';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1370,
+        "y": 600,
+        "wires": [
+            [
+                "8a6bdf124879e6ca"
+            ]
+        ]
+    },
+    {
+        "id": "809e1132288d19f5",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Build UPDATE Query",
+        "func": "const d = msg.payload;\nconst fn = d.first_name || '';\nconst ln = d.last_name || '';\nconst st = d.status || 'pending';\n\nconst userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = `UPDATE persons SET first_name='${fn}', last_name='${ln}', status='${st}' WHERE id=${d.id}`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 680,
+        "wires": [
+            [
+                "daf29bb83d95b5b0"
+            ]
+        ]
+    },
+    {
+        "id": "daf29bb83d95b5b0",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Update Face Record",
+        "x": 1170,
+        "y": 680,
+        "wires": [
+            [
+                "8e645c08d5a3df8d"
+            ]
+        ]
+    },
+    {
+        "id": "8e645c08d5a3df8d",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Send save_result to UI",
+        "func": "msg.payload = { success: true };\nmsg.topic   = 'save_result';\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1370,
+        "y": 680,
+        "wires": [
+            [
+                "8a6bdf124879e6ca"
+            ]
+        ]
+    },
+    {
+        "id": "33a12c682079c1d7",
+        "type": "ui-template",
+        "z": "b31915b6cc494042",
+        "group": "face_table_group",
+        "name": "All Records Table",
+        "order": 2,
+        "width": "24",
+        "height": "14",
+        "head": "",
+        "format": "<template>\n  <div class=\"records-view\">\n    <div class=\"rv-header\">\n      <div class=\"rv-title\">ALL <span>RECORDS</span></div>\n      <div class=\"rv-controls\">\n        <input class=\"rv-search\" v-model=\"search\" placeholder=\"Search name, status...\" />\n        <button class=\"rv-refresh\" @click=\"load\">&#8635; REFRESH</button>\n        <span class=\"rv-count\">{{ filtered.length }} / {{ rows.length }} rows</span>\n      </div>\n    </div>\n    <div class=\"rv-table-wrap\">\n      <table class=\"rv-table\" v-if=\"rows.length > 0\">\n        <thead>\n          <tr>\n            <th @click=\"sortBy('id')\"         class=\"sortable\">ID     <span class=\"sort-icon\">{{ sortIcon('id') }}</span></th>\n            <th @click=\"sortBy('first_name')\" class=\"sortable\">FIRST  <span class=\"sort-icon\">{{ sortIcon('first_name') }}</span></th>\n            <th @click=\"sortBy('last_name')\"  class=\"sortable\">LAST   <span class=\"sort-icon\">{{ sortIcon('last_name') }}</span></th>\n            <th @click=\"sortBy('status')\"     class=\"sortable\">STATUS <span class=\"sort-icon\">{{ sortIcon('status') }}</span></th>\n            <th>PHOTO PATH</th>\n            <th>EMBEDDING</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr v-for=\"row in paginated\" :key=\"row.id\" :class=\"'row-' + row.status\">\n            <td class=\"mono\">{{ row.id }}</td>\n            <td>{{ row.first_name || '—' }}</td>\n            <td>{{ row.last_name  || '—' }}</td>\n            <td><span class=\"pill\" :class=\"row.status\">{{ row.status }}</span></td>\n            <td class=\"mono path-cell\" :title=\"row.photo_path\">{{ truncate(row.photo_path, 38) }}</td>\n            <td class=\"mono emb-cell\"  :title=\"row.embedding\" >{{ truncate(row.embedding,  30) }}</td>\n          </tr>\n        </tbody>\n      </table>\n      <div class=\"rv-empty\" v-else><span>&#9711;</span><p>No records found.</p></div>\n    </div>\n    <div class=\"rv-pagination\" v-if=\"totalPages > 1\">\n      <button class=\"pg-btn\" @click=\"page = 1\"          :disabled=\"page === 1\">&#171;</button>\n      <button class=\"pg-btn\" @click=\"page--\"            :disabled=\"page === 1\">&#8249;</button>\n      <span class=\"pg-info\">Page {{ page }} of {{ totalPages }}</span>\n      <button class=\"pg-btn\" @click=\"page++\"            :disabled=\"page === totalPages\">&#8250;</button>\n      <button class=\"pg-btn\" @click=\"page = totalPages\" :disabled=\"page === totalPages\">&#187;</button>\n      <select class=\"pg-size\" v-model=\"pageSize\">\n        <option :value=\"10\">10 / page</option>\n        <option :value=\"25\">25 / page</option>\n        <option :value=\"50\">50 / page</option>\n      </select>\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return { rows: [], search: '', sortKey: 'id', sortDir: 1, page: 1, pageSize: 10 };\n  },\n  computed: {\n    filtered() {\n      const q = this.search.toLowerCase();\n      const data = q ? this.rows.filter(r =>\n        (r.first_name||'').toLowerCase().includes(q) ||\n        (r.last_name||'').toLowerCase().includes(q)  ||\n        (r.status||'').toLowerCase().includes(q)     ||\n        String(r.id).includes(q)\n      ) : this.rows;\n      return [...data].sort((a, b) => {\n        const av = a[this.sortKey] ?? '';\n        const bv = b[this.sortKey] ?? '';\n        return av < bv ? -this.sortDir : av > bv ? this.sortDir : 0;\n      });\n    },\n    totalPages() { return Math.max(1, Math.ceil(this.filtered.length / this.pageSize)); },\n    paginated() { const s = (this.page - 1) * this.pageSize; return this.filtered.slice(s, s + this.pageSize); }\n  },\n  watch: {\n    msg(newMsg) {\n      if (!newMsg) return;\n      if (newMsg.topic === 'table_data') {\n        this.rows = newMsg.payload || [];\n      }\n    },\n    search()   { this.page = 1; },\n    pageSize() { this.page = 1; }\n  },\n  mounted() {\n    this.load();\n  },\n  methods: {\n    load() { this.send({ topic: 'load_table', payload: null }); },\n    sortBy(key) {\n      if (this.sortKey === key) { this.sortDir *= -1; }\n      else { this.sortKey = key; this.sortDir = 1; }\n    },\n    sortIcon(key) { if (this.sortKey !== key) return '⇅'; return this.sortDir === 1 ? '↑' : '↓'; },\n    truncate(str, n) { if (!str) return '—'; return str.length > n ? str.slice(0, n) + '…' : str; }\n  }\n};\n</script>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');\n.records-view * { box-sizing: border-box; margin: 0; padding: 0; }\n.records-view { background: #0a0a0f; color: #c8d8e8; font-family: 'Exo 2', sans-serif; padding: 20px 24px; border: 1px solid #1a2535; border-radius: 4px; min-height: 480px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }\n.records-view::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 39px, #111827 40px); pointer-events: none; opacity: 0.2; }\n.rv-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #1e2d40; position: relative; }\n.rv-title { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #e0eaf5; }\n.rv-title span { color: #38bdf8; }\n.rv-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }\n.rv-search { background: #060d16; border: 1px solid #1a2e44; color: #c8d8e8; padding: 7px 12px; font-family: 'Exo 2', sans-serif; font-size: 0.82rem; border-radius: 2px; outline: none; width: 220px; transition: border-color 0.2s; }\n.rv-search:focus { border-color: #38bdf8; }\n.rv-search::placeholder { color: #2a4060; }\n.rv-refresh { background: transparent; border: 1px solid #1e3a55; color: #38bdf8; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; padding: 7px 14px; border-radius: 2px; cursor: pointer; transition: background 0.2s; }\n.rv-refresh:hover { background: #0f2035; }\n.rv-count { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: #3a5a7a; letter-spacing: 0.1em; }\n.rv-table-wrap { overflow-x: auto; flex: 1; position: relative; }\n.rv-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }\n.rv-table thead tr { border-bottom: 2px solid #1e3a55; }\n.rv-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; color: #3a5a7a; text-transform: uppercase; padding: 10px 14px; text-align: left; white-space: nowrap; user-select: none; }\n.rv-table th.sortable { cursor: pointer; }\n.rv-table th.sortable:hover { color: #38bdf8; }\n.sort-icon { margin-left: 4px; font-size: 0.65rem; opacity: 0.6; }\n.rv-table tbody tr { border-bottom: 1px solid #0f1a28; transition: background 0.15s; }\n.rv-table tbody tr:hover { background: #0d1a28; }\n.rv-table tbody tr.row-pending    { border-left: 2px solid #f59e0b33; }\n.rv-table tbody tr.row-identified { border-left: 2px solid #38bdf833; }\n.rv-table tbody tr.row-verified   { border-left: 2px solid #22c55e33; }\n.rv-table tbody tr.row-rejected   { border-left: 2px solid #ef444433; }\n.rv-table td { padding: 10px 14px; color: #8aaac8; vertical-align: middle; }\n.rv-table td.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; }\n.path-cell, .emb-cell { color: #3a5a7a; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.pill { display: inline-block; padding: 3px 10px; border-radius: 2px; font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid #1e2d40; color: #555; }\n.pill.pending    { background: #2d1e0088; border-color: #f59e0b66; color: #f59e0b; }\n.pill.identified { background: #00203088; border-color: #38bdf866; color: #38bdf8; }\n.pill.verified   { background: #00201088; border-color: #22c55e66; color: #22c55e; }\n.pill.rejected   { background: #20001088; border-color: #ef444466; color: #ef4444; }\n.rv-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 260px; color: #2a4060; }\n.rv-empty span { font-size: 2.5rem; }\n.rv-empty p { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; letter-spacing: 0.1em; }\n.rv-pagination { display: flex; align-items: center; gap: 6px; justify-content: flex-end; padding-top: 10px; border-top: 1px solid #1e2d40; position: relative; }\n.pg-btn { background: #0f1e2e; border: 1px solid #1e3a55; color: #38bdf8; width: 30px; height: 30px; border-radius: 2px; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }\n.pg-btn:hover:not(:disabled) { background: #162840; }\n.pg-btn:disabled { opacity: 0.25; cursor: default; }\n.pg-info { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: #3a5a7a; letter-spacing: 0.1em; padding: 0 6px; }\n.pg-size { background: #060d16; border: 1px solid #1a2e44; color: #6b8aaa; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; padding: 4px 8px; border-radius: 2px; margin-left: 8px; cursor: pointer; }\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 550,
+        "y": 800,
+        "wires": [
+            [
+                "61e4987886f684d8"
+            ]
+        ]
+    },
+    {
+        "id": "61e4987886f684d8",
+        "type": "switch",
+        "z": "b31915b6cc494042",
+        "name": "Table Route",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "load_table",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 1,
+        "x": 770,
+        "y": 800,
+        "wires": [
+            [
+                "e80935f834f32c9c"
+            ]
+        ]
+    },
+    {
+        "id": "e80935f834f32c9c",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Build Full SELECT",
+        "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = 'SELECT id, first_name, last_name, photo_path, embedding, status FROM persons ORDER BY id ASC';\nreturn msg;",
+        "outputs": 1,
+        "x": 970,
+        "y": 800,
+        "wires": [
+            [
+                "9a758571dcfeeb0d"
+            ]
+        ]
+    },
+    {
+        "id": "9a758571dcfeeb0d",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Query All Columns",
+        "x": 1170,
+        "y": 800,
+        "wires": [
+            [
+                "e28d2c79b8d0f57a"
+            ]
+        ]
+    },
+    {
+        "id": "e28d2c79b8d0f57a",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Send table_data to UI",
+        "func": "msg.topic = 'table_data';\nreturn msg;",
+        "outputs": 1,
+        "x": 1370,
+        "y": 800,
+        "wires": [
+            [
+                "33a12c682079c1d7"
+            ]
+        ]
+    },
+    {
+        "id": "1a043b17b9f60702",
+        "type": "http in",
+        "z": "b31915b6cc494042",
+        "name": "GET /faces/:filename",
+        "url": "/faces/:filename",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 310,
+        "y": 900,
+        "wires": [
+            [
+                "0dabfb7e0453066a"
+            ]
+        ]
+    },
+    {
+        "id": "0dabfb7e0453066a",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Build file path",
+        "func": "const filename = msg.req.params.filename;\n// Strip any path traversal for safety\nconst safe = filename.replace(/[^a-zA-Z0-9_\\-\\.]/g, '');\n\nlet userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.filename = userDir + '/saved_faces/' + safe;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 900,
+        "wires": [
+            [
+                "21947ed4f6c1cc60"
+            ]
+        ]
+    },
+    {
+        "id": "21947ed4f6c1cc60",
+        "type": "file in",
+        "z": "b31915b6cc494042",
+        "name": "Read face image",
+        "filename": "filename",
+        "filenameType": "msg",
+        "format": "",
+        "chunk": false,
+        "sendError": true,
+        "encoding": "none",
+        "allProps": true,
+        "x": 720,
+        "y": 900,
+        "wires": [
+            [
+                "303a732232acd5a5"
+            ]
+        ]
+    },
+    {
+        "id": "303a732232acd5a5",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Set headers",
+        "func": "msg.headers = {\n    'Content-Type': 'image/jpeg',\n    'Cache-Control': 'max-age=3600'\n};\nmsg.statusCode = 200;\nreturn msg;",
+        "outputs": 1,
+        "x": 910,
+        "y": 900,
+        "wires": [
+            [
+                "b6ae3f130a22d9b1"
+            ]
+        ]
+    },
+    {
+        "id": "b6ae3f130a22d9b1",
+        "type": "http response",
+        "z": "b31915b6cc494042",
+        "name": "Send image",
+        "statusCode": "",
+        "headers": {},
+        "x": 1090,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "aff6e99209af1167",
+        "type": "inject",
+        "z": "b31915b6cc494042",
+        "name": "On Startup",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 140,
+        "wires": [
+            [
+                "41f07359cffeeb8a"
+            ]
+        ]
+    },
+    {
+        "id": "41f07359cffeeb8a",
+        "type": "exec",
+        "z": "b31915b6cc494042",
+        "command": "cmd.exe",
+        "addpay": "",
+        "append": "/c \"if not exist \"%USERPROFILE%\\saved_faces\" mkdir \"%USERPROFILE%\\saved_faces\"\"",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Init /saved_faces/",
+        "x": 410,
+        "y": 140,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d2a515463e182b8c",
+        "type": "file in",
+        "z": "b31915b6cc494042",
+        "name": "Read LFW Photo (Adjust Path)",
+        "filename": "C:\\Users\\lande\\George_W_Bush\\George_W_Bush_0001.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 650,
+        "y": 340,
+        "wires": [
+            [
+                "ae5fe517035956e1"
+            ]
+        ]
+    }
+]

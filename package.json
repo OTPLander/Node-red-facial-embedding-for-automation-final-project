@@ -1,17 +1,25 @@
 {
-  "name": "my-node-red-app",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "node-red": "^4.1.8",
-    "node-red-contrib-postgresql": "^0.15.4"
-  }
+    "name": "my-node-red-app",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "dependencies": {
+        "node-red": "^4.1.8",
+        "node-red-contrib-postgresql": "^0.15.4",
+        "node-red-contrib-queued-sqlite-fix": "0.0.1",
+        "@flowfuse/node-red-dashboard": "1.30.2"
+    },
+    "node-red": {
+        "settings": {
+            "flowFile": "flows.json",
+            "credentialsFile": "flows_cred.json"
+        }
+    }
 }
