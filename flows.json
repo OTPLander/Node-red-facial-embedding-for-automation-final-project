@@ -8,12 +8,6 @@
         "env": []
     },
     {
-        "id": "686b413b27a3785d",
-        "type": "sqliteQueuedDb",
-        "db": "${USERPROFILE}\\saved_faces\\face_data.db",
-        "mode": "RWC"
-    },
-    {
         "id": "e5503fd55ff4511a",
         "type": "ui-base",
         "name": "My Dashboard",
@@ -125,6 +119,78 @@
         "disabled": "false"
     },
     {
+        "id": "686b413b27a3785d",
+        "type": "sqliteQueuedDb",
+        "db": "${USERPROFILE}\\saved_faces\\face_data.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "c6a66b5d3bc08639",
+        "type": "OPCUA-IIoT-Connector",
+        "discoveryUrl": "",
+        "endpoint": "opc.tcp://192.168.1.144:4840",
+        "endpointMustExist": false,
+        "keepSessionAlive": true,
+        "loginEnabled": true,
+        "name": "BECKHOFF",
+        "showErrors": true,
+        "securityPolicy": "Basic256Sha256",
+        "securityMode": "SignAndEncrypt",
+        "individualCerts": false,
+        "publicCertificateFile": "",
+        "privateKeyFile": "",
+        "defaultSecureTokenLifetime": "",
+        "autoSelectRightEndpoint": false,
+        "strategyMaxRetry": "",
+        "strategyInitialDelay": "",
+        "strategyMaxDelay": "",
+        "strategyRandomisationFactor": "",
+        "requestedSessionTimeout": "",
+        "connectionStartDelay": "",
+        "reconnectDelay": "",
+        "maxBadSessionRequests": 10
+    },
+    {
+        "id": "7a338c88fb20cc0c",
+        "type": "OPCUA-IIoT-Connector",
+        "discoveryUrl": "",
+        "endpoint": "opc.tcp://192.168.1.144:4840",
+        "endpointMustExist": false,
+        "keepSessionAlive": true,
+        "loginEnabled": true,
+        "name": "BECKHOFF",
+        "showErrors": true,
+        "securityPolicy": "Basic256Sha256",
+        "securityMode": "SignAndEncrypt",
+        "individualCerts": false,
+        "publicCertificateFile": "",
+        "privateKeyFile": "",
+        "defaultSecureTokenLifetime": "",
+        "autoSelectRightEndpoint": false,
+        "strategyMaxRetry": "",
+        "strategyInitialDelay": "",
+        "strategyMaxDelay": "",
+        "strategyRandomisationFactor": "",
+        "requestedSessionTimeout": "",
+        "connectionStartDelay": "",
+        "reconnectDelay": "",
+        "maxBadSessionRequests": 10
+    },
+    {
+        "id": "6dc276e12f03d13f",
+        "type": "ui-group",
+        "name": "Group Name",
+        "page": "927b096e3e8c2156",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
         "id": "3aa4c2141cf959ac",
         "type": "inject",
         "z": "b31915b6cc494042",
@@ -140,8 +206,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 430,
-        "y": 220,
+        "x": 150,
+        "y": 260,
         "wires": [
             [
                 "2079967e09a28244"
@@ -155,29 +221,11 @@
         "name": "Ensure Table + Clean Nulls",
         "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = `CREATE TABLE IF NOT EXISTS persons (\n    id         INTEGER PRIMARY KEY AUTOINCREMENT,\n    first_name TEXT,\n    last_name  TEXT,\n    photo_path TEXT,\n    embedding  TEXT,\n    status     TEXT\n);\nDELETE FROM persons\nWHERE first_name IS NULL\n  AND last_name  IS NULL\n  AND photo_path IS NULL;`;\nreturn msg;",
         "outputs": 1,
-        "x": 650,
-        "y": 220,
+        "x": 410,
+        "y": 260,
         "wires": [
             [
                 "d265777c9b809965"
-            ]
-        ]
-    },
-    {
-        "id": "d265777c9b809965",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Local Database",
-        "x": 890,
-        "y": 220,
-        "wires": [
-            [
-                "b7a0caa963dc0433"
             ]
         ]
     },
@@ -194,8 +242,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1100,
-        "y": 220,
+        "x": 860,
+        "y": 260,
         "wires": []
     },
     {
@@ -214,8 +262,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 230,
-        "y": 360,
+        "x": 170,
+        "y": 420,
         "wires": [
             [
                 "d2a515463e182b8c"
@@ -229,8 +277,8 @@
         "name": "Extract Bytes for Python",
         "func": "let buf = msg.payload;\nlet byteDict = {};\nfor(let i = 0; i < buf.length; i++) {\n    byteDict[i] = buf[i];\n}\nmsg.payload = { image_bytes: byteDict };\nreturn msg;",
         "outputs": 1,
-        "x": 750,
-        "y": 360,
+        "x": 690,
+        "y": 420,
         "wires": [
             [
                 "1ce8cc543c06cadc"
@@ -245,7 +293,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://localhost:5000/embed_and_reconstruct",
+        "url": "http://localhost:5005/embed_and_reconstruct",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -260,11 +308,11 @@
                 "valueValue": "application/json"
             }
         ],
-        "x": 250,
-        "y": 400,
+        "x": 1030,
+        "y": 420,
         "wires": [
             [
-                "check_db_query"
+                "f8b7ff80db0eab99"
             ]
         ]
     },
@@ -275,16 +323,14 @@
         "name": "Prepare SQL and File",
         "func": "if (msg.payload.status === 'success') {\n\n    let embeddingStr = JSON.stringify(msg.payload.embedding);\n\n    let base64Data = msg.payload.imagen_base64.split(',')[1];\n    let imageBuffer = Buffer.from(base64Data, 'base64');\n\n    let timestamp = Date.now();\n    let filename  = 'pending_face_' + timestamp + '.jpg';\n    \n    let userDir = env.get(\"USERPROFILE\") || \"C:\";\n    let fullPath  = userDir + '/saved_faces/' + filename;\n\n    let msgFile = {\n        filename: fullPath,\n        payload:  imageBuffer\n    };\n\n    let query = \"INSERT INTO persons (first_name, last_name, photo_path, embedding, status) VALUES ('', '', '\" + fullPath.replace(/\\\\/g, '/') + \"', '\" + embeddingStr + \"', 'pending')\";\n\n    let msgSQL = {\n        topic:  query,\n        database: userDir + \"/saved_faces/face_data.db\"\n    };\n\n    return [msgFile, msgSQL];\n\n} else {\n    node.error('Python error: ' + msg.payload.error);\n    return [null, null];\n}",
         "outputs": 2,
-        "x": 460,
+        "x": 390,
         "y": 640,
         "wires": [
             [
-                "4eab7624d190103e",
-                "a6525f423972ee46"
+                "4eab7624d190103e"
             ],
             [
-                "1be746a37ebb9182",
-                "2c81241b3b7a13c9"
+                "1be746a37ebb9182"
             ]
         ]
     },
@@ -299,63 +345,11 @@
         "createDir": true,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 750,
-        "y": 600,
+        "x": 680,
+        "y": 680,
         "wires": [
             []
         ]
-    },
-    {
-        "id": "a6525f423972ee46",
-        "type": "debug",
-        "z": "b31915b6cc494042",
-        "name": "File Saved",
-        "active": false,
-        "tosidebar": true,
-        "console": true,
-        "tostatus": false,
-        "complete": "filename",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 750,
-        "y": 660,
-        "wires": []
-    },
-    {
-        "id": "1be746a37ebb9182",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Insert New Face",
-        "x": 750,
-        "y": 720,
-        "wires": [
-            [
-                "2c81241b3b7a13c9"
-            ]
-        ]
-    },
-    {
-        "id": "2c81241b3b7a13c9",
-        "type": "debug",
-        "z": "b31915b6cc494042",
-        "name": "SQL Executed",
-        "active": false,
-        "tosidebar": true,
-        "console": true,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1130,
-        "y": 660,
-        "wires": []
     },
     {
         "id": "58e521646670c8fb",
@@ -379,8 +373,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 2,
-        "x": 550,
-        "y": 840,
+        "x": 360,
+        "y": 860,
         "wires": [
             [
                 "2362aaf9df236738"
@@ -402,29 +396,11 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 800,
+        "x": 560,
+        "y": 820,
         "wires": [
             [
                 "7d9fc92e9a40898d"
-            ]
-        ]
-    },
-    {
-        "id": "7d9fc92e9a40898d",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Query All Faces",
-        "x": 950,
-        "y": 800,
-        "wires": [
-            [
-                "1952005aed97c097"
             ]
         ]
     },
@@ -440,8 +416,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 800,
+        "x": 960,
+        "y": 820,
         "wires": [
             [
                 "8a6bdf124879e6ca"
@@ -460,29 +436,11 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 880,
+        "x": 560,
+        "y": 900,
         "wires": [
             [
                 "daf29bb83d95b5b0"
-            ]
-        ]
-    },
-    {
-        "id": "daf29bb83d95b5b0",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Update Face Record",
-        "x": 950,
-        "y": 880,
-        "wires": [
-            [
-                "8e645c08d5a3df8d"
             ]
         ]
     },
@@ -498,8 +456,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 880,
+        "x": 960,
+        "y": 900,
         "wires": [
             [
                 "8a6bdf124879e6ca"
@@ -523,8 +481,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 550,
-        "y": 1000,
+        "x": 350,
+        "y": 980,
         "wires": [
             [
                 "e80935f834f32c9c"
@@ -538,29 +496,11 @@
         "name": "Build Full SELECT",
         "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = 'SELECT id, first_name, last_name, photo_path, embedding, status FROM persons ORDER BY id ASC';\nreturn msg;",
         "outputs": 1,
-        "x": 750,
-        "y": 1000,
+        "x": 560,
+        "y": 980,
         "wires": [
             [
                 "9a758571dcfeeb0d"
-            ]
-        ]
-    },
-    {
-        "id": "9a758571dcfeeb0d",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Query All Columns",
-        "x": 950,
-        "y": 1000,
-        "wires": [
-            [
-                "e28d2c79b8d0f57a"
             ]
         ]
     },
@@ -571,8 +511,8 @@
         "name": "Send table_data to UI",
         "func": "msg.topic = 'table_data';\nreturn msg;",
         "outputs": 1,
-        "x": 1150,
-        "y": 1000,
+        "x": 960,
+        "y": 980,
         "wires": [
             [
                 "e7b7f7028c740910"
@@ -589,8 +529,8 @@
         "upload": false,
         "skipBodyParsing": false,
         "swaggerDoc": "",
-        "x": 90,
-        "y": 1100,
+        "x": 130,
+        "y": 1040,
         "wires": [
             [
                 "0dabfb7e0453066a"
@@ -609,8 +549,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 300,
-        "y": 1100,
+        "x": 340,
+        "y": 1040,
         "wires": [
             [
                 "21947ed4f6c1cc60"
@@ -629,8 +569,8 @@
         "sendError": true,
         "encoding": "none",
         "allProps": true,
-        "x": 500,
-        "y": 1100,
+        "x": 540,
+        "y": 1040,
         "wires": [
             [
                 "303a732232acd5a5"
@@ -644,8 +584,8 @@
         "name": "Set headers",
         "func": "msg.headers = {\n    'Content-Type': 'image/jpeg',\n    'Cache-Control': 'max-age=3600'\n};\nmsg.statusCode = 200;\nreturn msg;",
         "outputs": 1,
-        "x": 690,
-        "y": 1100,
+        "x": 730,
+        "y": 1040,
         "wires": [
             [
                 "b6ae3f130a22d9b1"
@@ -659,8 +599,8 @@
         "name": "Send image",
         "statusCode": "",
         "headers": {},
-        "x": 870,
-        "y": 1100,
+        "x": 910,
+        "y": 1040,
         "wires": []
     },
     {
@@ -680,11 +620,12 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 210,
+        "x": 130,
         "y": 140,
         "wires": [
             [
-                "41f07359cffeeb8a"
+                "41f07359cffeeb8a",
+                "2fea4c1170ec2f8d"
             ]
         ]
     },
@@ -713,71 +654,18 @@
         "type": "file in",
         "z": "b31915b6cc494042",
         "name": "Read LFW Photo (Adjust Path)",
-        "filename": "C:\\Users\\lande\\George_W_Bush\\George_W_Bush_0001.jpg",
+        "filename": "C:\\Users\\Lander Nieto\\Desktop\\CARAS\\George_W_Bush\\George_W_Bush_0001.jpg",
         "filenameType": "str",
         "format": "",
         "chunk": false,
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 490,
-        "y": 360,
+        "x": 430,
+        "y": 420,
         "wires": [
             [
                 "ae5fe517035956e1"
-            ]
-        ]
-    },
-    {
-        "id": "check_db_query",
-        "type": "function",
-        "z": "b31915b6cc494042",
-        "name": "1. Save Data & Query DB",
-        "func": "msg.new_face = msg.payload;\n\nif (msg.payload.status !== 'success') {\n    return null;\n}\n\nconst userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\nmsg.topic = \"SELECT id, embedding FROM persons WHERE embedding IS NOT NULL AND embedding != ''\";\n\nreturn msg;",
-        "outputs": 1,
-        "x": 230,
-        "y": 440,
-        "wires": [
-            [
-                "check_db_sqlite"
-            ]
-        ]
-    },
-    {
-        "id": "check_db_sqlite",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "2. Get Saved Faces",
-        "x": 460,
-        "y": 440,
-        "wires": [
-            [
-                "compare_faces"
-            ]
-        ]
-    },
-    {
-        "id": "compare_faces",
-        "type": "function",
-        "z": "b31915b6cc494042",
-        "name": "3. Compare Embeddings",
-        "func": "const existingFaces = msg.payload;\nconst newEmbedding = msg.new_face.embedding;\n\n// UMBRAL DE SIMILITUD EXACTO DE TU SCRIPT DE PYTHON\nconst THRESHOLD = 0.40; \n\n// Función para calcular la Distancia Coseno (equivalente a tu código de Numpy)\nfunction cosineDistance(vecA, vecB) {\n    let dotProduct = 0;\n    let normA = 0;\n    let normB = 0;\n    \n    for (let i = 0; i < vecA.length; i++) {\n        dotProduct += vecA[i] * vecB[i];\n        normA += vecA[i] * vecA[i];\n        normB += vecB[i] * vecB[i];\n    }\n    \n    if (normA === 0 || normB === 0) return 1; // Evitar división por cero\n    \n    return 1 - (dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)));\n}\n\nlet isDuplicate = false;\nlet matchedId = null;\n\nfor (let face of existingFaces) {\n    try {\n        let dbEmbedding = JSON.parse(face.embedding);\n        \n        // Usamos Distancia Coseno en lugar de Euclidiana\n        let distance = cosineDistance(newEmbedding, dbEmbedding);\n        \n        if (distance < THRESHOLD) {\n            isDuplicate = true;\n            matchedId = face.id;\n            break; // ¡Encontrado! Dejamos de buscar.\n        }\n    } catch(e) {\n        // Ignorar si un embedding antiguo está corrupto\n    }\n}\n\n// Restauramos el payload original para no romper el resto del flujo\nmsg.payload = msg.new_face;\nmsg.match_info = {\n    isDuplicate: isDuplicate,\n    matchedId: matchedId\n};\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 680,
-        "y": 440,
-        "wires": [
-            [
-                "branch_duplicate"
             ]
         ]
     },
@@ -799,33 +687,16 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 900,
-        "y": 440,
+        "x": 830,
+        "y": 540,
         "wires": [
             [
-                "debug_duplicate"
+                "check_blacklisted"
             ],
             [
                 "001daa9beea58063"
             ]
         ]
-    },
-    {
-        "id": "debug_duplicate",
-        "type": "debug",
-        "z": "b31915b6cc494042",
-        "name": "Already in DB!",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "match_info",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1640,
-        "y": 380,
-        "wires": []
     },
     {
         "id": "8a6bdf124879e6ca",
@@ -845,8 +716,8 @@
         "resendOnRefresh": true,
         "templateScope": "widget:page",
         "className": "",
-        "x": 330,
-        "y": 840,
+        "x": 140,
+        "y": 860,
         "wires": [
             [
                 "58e521646670c8fb"
@@ -871,11 +742,368 @@
         "resendOnRefresh": true,
         "templateScope": "widget:page",
         "className": "",
-        "x": 350,
-        "y": 1000,
+        "x": 130,
+        "y": 980,
         "wires": [
             [
                 "61e4987886f684d8"
+            ]
+        ]
+    },
+    {
+        "id": "d265777c9b809965",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Local Database",
+        "x": 650,
+        "y": 260,
+        "wires": [
+            [
+                "b7a0caa963dc0433"
+            ]
+        ]
+    },
+    {
+        "id": "1be746a37ebb9182",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Insert New Face",
+        "x": 680,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7d9fc92e9a40898d",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Query All Faces",
+        "x": 760,
+        "y": 820,
+        "wires": [
+            [
+                "1952005aed97c097"
+            ]
+        ]
+    },
+    {
+        "id": "daf29bb83d95b5b0",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Update Face Record",
+        "x": 760,
+        "y": 900,
+        "wires": [
+            [
+                "8e645c08d5a3df8d"
+            ]
+        ]
+    },
+    {
+        "id": "9a758571dcfeeb0d",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Query All Columns",
+        "x": 760,
+        "y": 980,
+        "wires": [
+            [
+                "e28d2c79b8d0f57a"
+            ]
+        ]
+    },
+    {
+        "id": "check_db_sqlite",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "2. Get Saved Faces",
+        "x": 390,
+        "y": 540,
+        "wires": [
+            [
+                "681eed3bcfb276b8"
+            ]
+        ]
+    },
+    {
+        "id": "dfee6fba2a7a8fc9",
+        "type": "OPCUA-IIoT-Listener",
+        "z": "b31915b6cc494042",
+        "connector": "c6a66b5d3bc08639",
+        "action": "subscribe",
+        "queueSize": 10,
+        "name": "",
+        "topic": "",
+        "justValue": true,
+        "useGroupItems": false,
+        "showStatusActivities": false,
+        "showErrors": false,
+        "x": 380,
+        "y": 380,
+        "wires": [
+            [
+                "509c91c6c45ad3a0"
+            ]
+        ]
+    },
+    {
+        "id": "1ded2cac2645a370",
+        "type": "OPCUA-IIoT-Inject",
+        "z": "b31915b6cc494042",
+        "injectType": "listen",
+        "payload": "60",
+        "payloadType": "num",
+        "topic": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "startDelay": "",
+        "name": "",
+        "addressSpaceItems": [
+            {
+                "name": "RPI",
+                "nodeId": "ns=4;s=MAIN.aImageRxBuffer",
+                "datatypeName": ""
+            },
+            {
+                "name": "",
+                "nodeId": "ns=4;s=MAIN.stSystem.inputs.iFacialDetec",
+                "datatypeName": ""
+            }
+        ],
+        "x": 110,
+        "y": 380,
+        "wires": [
+            [
+                "dfee6fba2a7a8fc9"
+            ]
+        ]
+    },
+    {
+        "id": "509c91c6c45ad3a0",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Extract Bytes From OPC UA",
+        "func": "// 1. Navegamos por la estructura\nif (!msg.payload || !msg.payload.value || !msg.payload.value.value || msg.payload.value.value.value === undefined) {\n    node.error(\"Estructura OPC UA no válida\");\n    return null;\n}\n\nlet rawData = msg.payload.value.value.value;\nlet dataArray = [];\n\n// 2. EXTRACCIÓN A PRUEBA DE BOMBAS\n// Filtramos según el formato en el que OPC UA haya escupido el buffer\nif (Buffer.isBuffer(rawData)) {\n    dataArray = Array.from(rawData);\n} else if (Array.isArray(rawData)) {\n    dataArray = rawData;\n} else if (rawData.data && Array.isArray(rawData.data)) {\n    // Formato de Buffer serializado { type: 'Buffer', data: [255, 216...] }\n    dataArray = rawData.data;\n} else if (typeof rawData === 'object') {\n    // Formato de Diccionario o TypedArray {\"0\": 255, \"1\": 216...}\n    if (rawData.length !== undefined) {\n        dataArray = Array.from(rawData);\n    } else {\n        dataArray = Object.values(rawData);\n    }\n}\n\n// Chivato por si acaso\nif (dataArray.length === 0) {\n    node.warn(\"El array está vacío. El formato raro recibido es: \" + typeof rawData);\n    return null;\n}\n\n// 3. BUSCAR EL FINAL DEL JPG (FF D9 -> 255 217)\nlet endIndex = dataArray.length;\n\nfor (let i = 0; i < dataArray.length - 1; i++) {\n    // El & 0xFF convierte los SInt (bytes con signo como -1) a USInt (255) mágicamente\n    let byte1 = dataArray[i] & 0xFF;\n    let byte2 = dataArray[i+1] & 0xFF;\n\n    if (byte1 === 255 && byte2 === 217) {\n        endIndex = i + 2; \n        break; \n    }\n}\n\n// 4. Recortamos la basura (los ceros del PLC) y lo pasamos al formato exacto de Flask\nlet byteDict = {};\nfor(let i = 0; i < endIndex; i++) {\n    byteDict[i] = dataArray[i] & 0xFF;\n}\n\n// Sobrescribimos el payload y lo enviamos al nodo HTTP Request\nmsg.payload = { image_bytes: byteDict };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 380,
+        "wires": [
+            [
+                "1ce8cc543c06cadc"
+            ]
+        ]
+    },
+    {
+        "id": "exec_pm2",
+        "type": "exec",
+        "z": "b31915b6cc494042",
+        "command": "cmd.exe /c ",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Start/Restart PM2 API",
+        "x": 400,
+        "y": 80,
+        "wires": [
+            [
+                "c57087b0ff335bce"
+            ],
+            [
+                "80d02e62d364edf2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "ace498930db31820",
+        "type": "inject",
+        "z": "b31915b6cc494042",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 100,
+        "wires": [
+            [
+                "2fea4c1170ec2f8d"
+            ]
+        ]
+    },
+    {
+        "id": "c57087b0ff335bce",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "PM2 Log",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "$string(payload)",
+        "targetType": "jsonata",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "80d02e62d364edf2",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "PM2 Error",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "$string(payload)",
+        "targetType": "jsonata",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "2fea4c1170ec2f8d",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Auto-Install & Boot API",
+        "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nconst projectDir = userDir + \"\\\\.node-red\\\\projects\\\\face-registration-system\";\nconst weightsDir = userDir + \"\\\\.deepface\\\\weights\";\nconst weightsFile = weightsDir + \"\\\\facenet_weights.h5\";\nconst weightsUrl = \"https://github.com/serengil/deepface_models/releases/download/v1.0/facenet_weights.h5\";\n\n// 1. SIN PARÉNTESIS y usando 'call' para que NPM no se trague caracteres extraños\nlet cmd = `where pm2 >nul 2>nul || call npm install -g pm2`;\n\n// 2. Pre-descarga del modelo Facenet de DeepFace\ncmd += ` && if not exist \"${weightsDir}\" mkdir \"${weightsDir}\"`;\ncmd += ` && if not exist \"${weightsFile}\" curl -# -L -o \"${weightsFile}\" \"${weightsUrl}\"`;\n\n// 3. Arranque del backend\ncmd += ` && cd \"${projectDir}\"`;\n\n// 4. PIP install (también sin paréntesis para no tentar a la suerte)\ncmd += ` && if exist requirements.txt pip install -r requirements.txt`;\n\n// 5. PM2 con 'call' para evitar que Windows rompa la cadena\ncmd += ` && call pm2 restart face-api || call pm2 start api.py --name face-api --interpreter python`;\n\nmsg.payload = cmd;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 20,
+        "wires": [
+            [
+                "exec_pm2"
+            ]
+        ]
+    },
+    {
+        "id": "f8b7ff80db0eab99",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "1. Save Data & Query DB",
+        "func": "msg.new_face = msg.payload;\n\nif (msg.payload.status !== 'success') {\n    return null;\n}\n\nconst userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\n// AÑADIDO: Ahora también pedimos la columna 'status' de golpe\nmsg.topic = \"SELECT id, embedding, status FROM persons WHERE embedding IS NOT NULL AND embedding != ''\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 150,
+        "y": 540,
+        "wires": [
+            [
+                "check_db_sqlite"
+            ]
+        ]
+    },
+    {
+        "id": "681eed3bcfb276b8",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "3. Compare Embeddings",
+        "func": "const existingFaces = msg.payload;\nconst newEmbedding = msg.new_face.embedding;\n\nconst THRESHOLD = 0.40; \n\nfunction cosineDistance(vecA, vecB) {\n    let dotProduct = 0;\n    let normA = 0;\n    let normB = 0;\n    \n    for (let i = 0; i < vecA.length; i++) {\n        dotProduct += vecA[i] * vecB[i];\n        normA += vecA[i] * vecA[i];\n        normB += vecB[i] * vecB[i];\n    }\n    \n    if (normA === 0 || normB === 0) return 1; \n    \n    return 1 - (dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)));\n}\n\nlet isDuplicate = false;\nlet matchedId = null;\nlet matchedStatus = null; // Variable nueva para guardar el estado\n\nfor (let face of existingFaces) {\n    try {\n        let dbEmbedding = JSON.parse(face.embedding);\n        let distance = cosineDistance(newEmbedding, dbEmbedding);\n        \n        if (distance < THRESHOLD) {\n            isDuplicate = true;\n            matchedId = face.id;\n            matchedStatus = face.status; // Extraemos el estado de la DB en el acto\n            break; \n        }\n    } catch(e) {}\n}\n\nmsg.payload = msg.new_face;\nmsg.match_info = {\n    isDuplicate: isDuplicate,\n    matchedId: matchedId,\n    matchedStatus: matchedStatus // Lo pasamos al siguiente nodo\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 540,
+        "wires": [
+            [
+                "branch_duplicate"
+            ]
+        ]
+    },
+    {
+        "id": "12483c9c542d83d7",
+        "type": "OPCUA-IIoT-Write",
+        "z": "b31915b6cc494042",
+        "connector": "c6a66b5d3bc08639",
+        "name": "Trigger iFacialDetec",
+        "justValue": false,
+        "showStatusActivities": false,
+        "showErrors": true,
+        "x": 1320,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "check_blacklisted",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Is Blacklisted?",
+        "func": "// 1. Normalizamos el texto de SQLite\nlet currentStatus = (msg.match_info.matchedStatus || \"\").toString().trim().toLowerCase();\n\nif (currentStatus === 'blacklisted') {\n    // 2. LA OPCIÓN NUCLEAR: Le damos TODO mascado al nodo OPC UA Write\n    // Definimos qué variable es Y su valor exacto en el mismo paquete.\n    msg.payload = {\n        injectType: \"write\",\n        addressSpaceItems: [\n            {\n                name: \"Detec_Alert\",\n                nodeId: \"ns=4;s=MAIN.stSystem.inputs.iFacialDetec\",\n                datatypeName: \"Boolean\"\n            }\n        ],\n        valuesToWrite: [true]\n    };\n    \n    return msg;\n}\n\n// Si no es blacklisted, detenemos el flujo\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 500,
+        "wires": [
+            [
+                "12483c9c542d83d7"
             ]
         ]
     }

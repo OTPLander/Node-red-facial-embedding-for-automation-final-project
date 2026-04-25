@@ -8,12 +8,6 @@
         "env": []
     },
     {
-        "id": "686b413b27a3785d",
-        "type": "sqliteQueuedDb",
-        "db": "${USERPROFILE}\\saved_faces\\face_data.db",
-        "mode": "RWC"
-    },
-    {
         "id": "e5503fd55ff4511a",
         "type": "ui-base",
         "name": "My Dashboard",
@@ -125,6 +119,78 @@
         "disabled": "false"
     },
     {
+        "id": "686b413b27a3785d",
+        "type": "sqliteQueuedDb",
+        "db": "${USERPROFILE}\\saved_faces\\face_data.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "c6a66b5d3bc08639",
+        "type": "OPCUA-IIoT-Connector",
+        "discoveryUrl": "",
+        "endpoint": "opc.tcp://192.168.1.144:4840",
+        "endpointMustExist": false,
+        "keepSessionAlive": true,
+        "loginEnabled": true,
+        "name": "BECKHOFF",
+        "showErrors": true,
+        "securityPolicy": "Basic256Sha256",
+        "securityMode": "SignAndEncrypt",
+        "individualCerts": false,
+        "publicCertificateFile": "",
+        "privateKeyFile": "",
+        "defaultSecureTokenLifetime": "",
+        "autoSelectRightEndpoint": false,
+        "strategyMaxRetry": "",
+        "strategyInitialDelay": "",
+        "strategyMaxDelay": "",
+        "strategyRandomisationFactor": "",
+        "requestedSessionTimeout": "",
+        "connectionStartDelay": "",
+        "reconnectDelay": "",
+        "maxBadSessionRequests": 10
+    },
+    {
+        "id": "7a338c88fb20cc0c",
+        "type": "OPCUA-IIoT-Connector",
+        "discoveryUrl": "",
+        "endpoint": "opc.tcp://192.168.1.144:4840",
+        "endpointMustExist": false,
+        "keepSessionAlive": true,
+        "loginEnabled": true,
+        "name": "BECKHOFF",
+        "showErrors": true,
+        "securityPolicy": "Basic256Sha256",
+        "securityMode": "SignAndEncrypt",
+        "individualCerts": false,
+        "publicCertificateFile": "",
+        "privateKeyFile": "",
+        "defaultSecureTokenLifetime": "",
+        "autoSelectRightEndpoint": false,
+        "strategyMaxRetry": "",
+        "strategyInitialDelay": "",
+        "strategyMaxDelay": "",
+        "strategyRandomisationFactor": "",
+        "requestedSessionTimeout": "",
+        "connectionStartDelay": "",
+        "reconnectDelay": "",
+        "maxBadSessionRequests": 10
+    },
+    {
+        "id": "6dc276e12f03d13f",
+        "type": "ui-group",
+        "name": "Group Name",
+        "page": "927b096e3e8c2156",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
         "id": "3aa4c2141cf959ac",
         "type": "inject",
         "z": "b31915b6cc494042",
@@ -140,8 +206,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 430,
-        "y": 220,
+        "x": 150,
+        "y": 260,
         "wires": [
             [
                 "2079967e09a28244"
@@ -155,29 +221,11 @@
         "name": "Ensure Table + Clean Nulls",
         "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = `CREATE TABLE IF NOT EXISTS persons (\n    id         INTEGER PRIMARY KEY AUTOINCREMENT,\n    first_name TEXT,\n    last_name  TEXT,\n    photo_path TEXT,\n    embedding  TEXT,\n    status     TEXT\n);\nDELETE FROM persons\nWHERE first_name IS NULL\n  AND last_name  IS NULL\n  AND photo_path IS NULL;`;\nreturn msg;",
         "outputs": 1,
-        "x": 650,
-        "y": 220,
+        "x": 410,
+        "y": 260,
         "wires": [
             [
                 "d265777c9b809965"
-            ]
-        ]
-    },
-    {
-        "id": "d265777c9b809965",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Local Database",
-        "x": 890,
-        "y": 220,
-        "wires": [
-            [
-                "b7a0caa963dc0433"
             ]
         ]
     },
@@ -194,8 +242,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1100,
-        "y": 220,
+        "x": 860,
+        "y": 260,
         "wires": []
     },
     {
@@ -214,8 +262,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 230,
-        "y": 360,
+        "x": 170,
+        "y": 600,
         "wires": [
             [
                 "d2a515463e182b8c"
@@ -229,8 +277,8 @@
         "name": "Extract Bytes for Python",
         "func": "let buf = msg.payload;\nlet byteDict = {};\nfor(let i = 0; i < buf.length; i++) {\n    byteDict[i] = buf[i];\n}\nmsg.payload = { image_bytes: byteDict };\nreturn msg;",
         "outputs": 1,
-        "x": 750,
-        "y": 360,
+        "x": 690,
+        "y": 600,
         "wires": [
             [
                 "1ce8cc543c06cadc"
@@ -245,7 +293,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://localhost:5000/embed_and_reconstruct",
+        "url": "http://localhost:5005/embed_and_reconstruct",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -260,11 +308,11 @@
                 "valueValue": "application/json"
             }
         ],
-        "x": 250,
-        "y": 400,
+        "x": 1050,
+        "y": 600,
         "wires": [
             [
-                "check_db_query"
+                "f8b7ff80db0eab99"
             ]
         ]
     },
@@ -275,8 +323,8 @@
         "name": "Prepare SQL and File",
         "func": "if (msg.payload.status === 'success') {\n\n    let embeddingStr = JSON.stringify(msg.payload.embedding);\n\n    let base64Data = msg.payload.imagen_base64.split(',')[1];\n    let imageBuffer = Buffer.from(base64Data, 'base64');\n\n    let timestamp = Date.now();\n    let filename  = 'pending_face_' + timestamp + '.jpg';\n    \n    let userDir = env.get(\"USERPROFILE\") || \"C:\";\n    let fullPath  = userDir + '/saved_faces/' + filename;\n\n    let msgFile = {\n        filename: fullPath,\n        payload:  imageBuffer\n    };\n\n    let query = \"INSERT INTO persons (first_name, last_name, photo_path, embedding, status) VALUES ('', '', '\" + fullPath.replace(/\\\\/g, '/') + \"', '\" + embeddingStr + \"', 'pending')\";\n\n    let msgSQL = {\n        topic:  query,\n        database: userDir + \"/saved_faces/face_data.db\"\n    };\n\n    return [msgFile, msgSQL];\n\n} else {\n    node.error('Python error: ' + msg.payload.error);\n    return [null, null];\n}",
         "outputs": 2,
-        "x": 460,
-        "y": 640,
+        "x": 390,
+        "y": 820,
         "wires": [
             [
                 "4eab7624d190103e",
@@ -299,8 +347,8 @@
         "createDir": true,
         "overwriteFile": "true",
         "encoding": "none",
-        "x": 750,
-        "y": 600,
+        "x": 680,
+        "y": 780,
         "wires": [
             []
         ]
@@ -318,27 +366,9 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 750,
-        "y": 660,
+        "x": 680,
+        "y": 840,
         "wires": []
-    },
-    {
-        "id": "1be746a37ebb9182",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Insert New Face",
-        "x": 750,
-        "y": 720,
-        "wires": [
-            [
-                "2c81241b3b7a13c9"
-            ]
-        ]
     },
     {
         "id": "2c81241b3b7a13c9",
@@ -353,8 +383,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1130,
-        "y": 660,
+        "x": 1060,
+        "y": 840,
         "wires": []
     },
     {
@@ -379,8 +409,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 2,
-        "x": 550,
-        "y": 840,
+        "x": 560,
+        "y": 1040,
         "wires": [
             [
                 "2362aaf9df236738"
@@ -402,29 +432,11 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 800,
+        "x": 760,
+        "y": 1000,
         "wires": [
             [
                 "7d9fc92e9a40898d"
-            ]
-        ]
-    },
-    {
-        "id": "7d9fc92e9a40898d",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Query All Faces",
-        "x": 950,
-        "y": 800,
-        "wires": [
-            [
-                "1952005aed97c097"
             ]
         ]
     },
@@ -440,8 +452,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 800,
+        "x": 1160,
+        "y": 1000,
         "wires": [
             [
                 "8a6bdf124879e6ca"
@@ -460,29 +472,11 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 880,
+        "x": 760,
+        "y": 1080,
         "wires": [
             [
                 "daf29bb83d95b5b0"
-            ]
-        ]
-    },
-    {
-        "id": "daf29bb83d95b5b0",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Update Face Record",
-        "x": 950,
-        "y": 880,
-        "wires": [
-            [
-                "8e645c08d5a3df8d"
             ]
         ]
     },
@@ -498,8 +492,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 880,
+        "x": 1160,
+        "y": 1080,
         "wires": [
             [
                 "8a6bdf124879e6ca"
@@ -523,8 +517,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 550,
-        "y": 1000,
+        "x": 560,
+        "y": 1200,
         "wires": [
             [
                 "e80935f834f32c9c"
@@ -538,29 +532,11 @@
         "name": "Build Full SELECT",
         "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\nmsg.topic = 'SELECT id, first_name, last_name, photo_path, embedding, status FROM persons ORDER BY id ASC';\nreturn msg;",
         "outputs": 1,
-        "x": 750,
-        "y": 1000,
+        "x": 760,
+        "y": 1200,
         "wires": [
             [
                 "9a758571dcfeeb0d"
-            ]
-        ]
-    },
-    {
-        "id": "9a758571dcfeeb0d",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "Query All Columns",
-        "x": 950,
-        "y": 1000,
-        "wires": [
-            [
-                "e28d2c79b8d0f57a"
             ]
         ]
     },
@@ -571,11 +547,11 @@
         "name": "Send table_data to UI",
         "func": "msg.topic = 'table_data';\nreturn msg;",
         "outputs": 1,
-        "x": 1150,
-        "y": 1000,
+        "x": 1160,
+        "y": 1200,
         "wires": [
             [
-                "33a12c682079c1d7"
+                "e7b7f7028c740910"
             ]
         ]
     },
@@ -589,8 +565,8 @@
         "upload": false,
         "skipBodyParsing": false,
         "swaggerDoc": "",
-        "x": 90,
-        "y": 1100,
+        "x": 100,
+        "y": 1300,
         "wires": [
             [
                 "0dabfb7e0453066a"
@@ -609,8 +585,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 300,
-        "y": 1100,
+        "x": 310,
+        "y": 1300,
         "wires": [
             [
                 "21947ed4f6c1cc60"
@@ -629,8 +605,8 @@
         "sendError": true,
         "encoding": "none",
         "allProps": true,
-        "x": 500,
-        "y": 1100,
+        "x": 510,
+        "y": 1300,
         "wires": [
             [
                 "303a732232acd5a5"
@@ -644,8 +620,8 @@
         "name": "Set headers",
         "func": "msg.headers = {\n    'Content-Type': 'image/jpeg',\n    'Cache-Control': 'max-age=3600'\n};\nmsg.statusCode = 200;\nreturn msg;",
         "outputs": 1,
-        "x": 690,
-        "y": 1100,
+        "x": 700,
+        "y": 1300,
         "wires": [
             [
                 "b6ae3f130a22d9b1"
@@ -659,8 +635,8 @@
         "name": "Send image",
         "statusCode": "",
         "headers": {},
-        "x": 870,
-        "y": 1100,
+        "x": 880,
+        "y": 1300,
         "wires": []
     },
     {
@@ -680,11 +656,12 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 210,
+        "x": 150,
         "y": 140,
         "wires": [
             [
-                "41f07359cffeeb8a"
+                "41f07359cffeeb8a",
+                "2fea4c1170ec2f8d"
             ]
         ]
     },
@@ -713,71 +690,18 @@
         "type": "file in",
         "z": "b31915b6cc494042",
         "name": "Read LFW Photo (Adjust Path)",
-        "filename": "C:\\Users\\lande\\George_W_Bush\\George_W_Bush_0001.jpg",
+        "filename": "C:\\Users\\Lander Nieto\\Desktop\\CARAS\\George_W_Bush\\George_W_Bush_0001.jpg",
         "filenameType": "str",
         "format": "",
         "chunk": false,
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 490,
-        "y": 360,
+        "x": 430,
+        "y": 600,
         "wires": [
             [
                 "ae5fe517035956e1"
-            ]
-        ]
-    },
-    {
-        "id": "check_db_query",
-        "type": "function",
-        "z": "b31915b6cc494042",
-        "name": "1. Save Data & Query DB",
-        "func": "msg.new_face = msg.payload;\n\nif (msg.payload.status !== 'success') {\n    return null;\n}\n\nconst userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\nmsg.topic = \"SELECT id, embedding FROM persons WHERE embedding IS NOT NULL AND embedding != ''\";\n\nreturn msg;",
-        "outputs": 1,
-        "x": 230,
-        "y": 440,
-        "wires": [
-            [
-                "check_db_sqlite"
-            ]
-        ]
-    },
-    {
-        "id": "check_db_sqlite",
-        "type": "queuedsqlite",
-        "z": "b31915b6cc494042",
-        "mydb": "686b413b27a3785d",
-        "sqlquery": "msg.topic",
-        "dbName": "msg.database",
-        "db": "",
-        "sql": "",
-        "name": "2. Get Saved Faces",
-        "x": 460,
-        "y": 440,
-        "wires": [
-            [
-                "compare_faces"
-            ]
-        ]
-    },
-    {
-        "id": "compare_faces",
-        "type": "function",
-        "z": "b31915b6cc494042",
-        "name": "3. Compare Embeddings",
-        "func": "const existingFaces = msg.payload;\nconst newEmbedding = msg.new_face.embedding;\n\n// UMBRAL DE SIMILITUD EXACTO DE TU SCRIPT DE PYTHON\nconst THRESHOLD = 0.40; \n\n// Función para calcular la Distancia Coseno (equivalente a tu código de Numpy)\nfunction cosineDistance(vecA, vecB) {\n    let dotProduct = 0;\n    let normA = 0;\n    let normB = 0;\n    \n    for (let i = 0; i < vecA.length; i++) {\n        dotProduct += vecA[i] * vecB[i];\n        normA += vecA[i] * vecA[i];\n        normB += vecB[i] * vecB[i];\n    }\n    \n    if (normA === 0 || normB === 0) return 1; // Evitar división por cero\n    \n    return 1 - (dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)));\n}\n\nlet isDuplicate = false;\nlet matchedId = null;\n\nfor (let face of existingFaces) {\n    try {\n        let dbEmbedding = JSON.parse(face.embedding);\n        \n        // Usamos Distancia Coseno en lugar de Euclidiana\n        let distance = cosineDistance(newEmbedding, dbEmbedding);\n        \n        if (distance < THRESHOLD) {\n            isDuplicate = true;\n            matchedId = face.id;\n            break; // ¡Encontrado! Dejamos de buscar.\n        }\n    } catch(e) {\n        // Ignorar si un embedding antiguo está corrupto\n    }\n}\n\n// Restauramos el payload original para no romper el resto del flujo\nmsg.payload = msg.new_face;\nmsg.match_info = {\n    isDuplicate: isDuplicate,\n    matchedId: matchedId\n};\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 680,
-        "y": 440,
-        "wires": [
-            [
-                "branch_duplicate"
             ]
         ]
     },
@@ -799,11 +723,12 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 900,
-        "y": 440,
+        "x": 830,
+        "y": 720,
         "wires": [
             [
-                "debug_duplicate"
+                "debug_duplicate",
+                "check_blacklisted"
             ],
             [
                 "001daa9beea58063"
@@ -823,8 +748,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1640,
-        "y": 380,
+        "x": 1360,
+        "y": 700,
         "wires": []
     },
     {
@@ -845,8 +770,8 @@
         "resendOnRefresh": true,
         "templateScope": "widget:page",
         "className": "",
-        "x": 330,
-        "y": 840,
+        "x": 340,
+        "y": 1040,
         "wires": [
             [
                 "58e521646670c8fb"
@@ -854,7 +779,7 @@
         ]
     },
     {
-        "id": "33a12c682079c1d7",
+        "id": "e7b7f7028c740910",
         "type": "ui-template",
         "z": "b31915b6cc494042",
         "group": "",
@@ -865,17 +790,395 @@
         "width": "24",
         "height": "14",
         "head": "",
-        "format": "<template>\n  <div class=\"records-view\">\n    <div class=\"rv-header\">\n      <div class=\"rv-header-left\">\n        <button class=\"btn-nav\" @click=\"goTo('/registry')\">&#128247; BACK TO REGISTRY</button>\n      </div>\n      <div class=\"rv-title\">ALL <span>RECORDS</span></div>\n      <div class=\"rv-header-right\">\n        <input class=\"rv-search\" v-model=\"search\" placeholder=\"Search name, status...\" />\n        <button class=\"rv-refresh\" @click=\"load\">&#8635; REFRESH</button>\n        <span class=\"rv-count\">{{ filtered.length }} / {{ rows.length }} rows</span>\n      </div>\n    </div>\n    <div class=\"rv-table-wrap\">\n      <table class=\"rv-table\" v-if=\"rows.length > 0\">\n        <thead>\n          <tr>\n            <th @click=\"sortBy('id')\"         class=\"sortable\">ID     <span class=\"sort-icon\">{{ sortIcon('id') }}</span></th>\n            <th @click=\"sortBy('first_name')\" class=\"sortable\">FIRST  <span class=\"sort-icon\">{{ sortIcon('first_name') }}</span></th>\n            <th @click=\"sortBy('last_name')\"  class=\"sortable\">LAST   <span class=\"sort-icon\">{{ sortIcon('last_name') }}</span></th>\n            <th @click=\"sortBy('status')\"     class=\"sortable\">STATUS <span class=\"sort-icon\">{{ sortIcon('status') }}</span></th>\n            <th>PHOTO PATH</th>\n            <th>EMBEDDING</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr v-for=\"row in paginated\" :key=\"row.id\" :class=\"'row-' + row.status\">\n            <td class=\"mono\">{{ row.id }}</td>\n            <td>{{ row.first_name || '—' }}</td>\n            <td>{{ row.last_name  || '—' }}</td>\n            <td><span class=\"pill\" :class=\"row.status\">{{ row.status }}</span></td>\n            <td class=\"mono path-cell\" :title=\"row.photo_path\">{{ truncate(row.photo_path, 38) }}</td>\n            <td class=\"mono emb-cell\"  :title=\"row.embedding\" >{{ truncate(row.embedding,  30) }}</td>\n          </tr>\n        </tbody>\n      </table>\n      <div class=\"rv-empty\" v-else><span>&#9711;</span><p>No records found.</p></div>\n    </div>\n    <div class=\"rv-pagination\" v-if=\"totalPages > 1\">\n      <button class=\"pg-btn\" @click=\"page = 1\"          :disabled=\"page === 1\">&#171;</button>\n      <button class=\"pg-btn\" @click=\"page--\"            :disabled=\"page === 1\">&#8249;</button>\n      <span class=\"pg-info\">Page {{ page }} of {{ totalPages }}</span>\n      <button class=\"pg-btn\" @click=\"page++\"            :disabled=\"page === totalPages\">&#8250;</button>\n      <button class=\"pg-btn\" @click=\"page = totalPages\" :disabled=\"page === totalPages\">&#187;</button>\n      <select class=\"pg-size\" v-model=\"pageSize\">\n        <option :value=\"10\">10 / page</option>\n        <option :value=\"25\">25 / page</option>\n        <option :value=\"50\">50 / page</option>\n      </select>\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return { rows: [], search: '', sortKey: 'id', sortDir: 1, page: 1, pageSize: 10 };\n  },\n  computed: {\n    filtered() {\n      const q = this.search.toLowerCase();\n      const data = q ? this.rows.filter(r =>\n        (r.first_name||'').toLowerCase().includes(q) ||\n        (r.last_name||'').toLowerCase().includes(q)  ||\n        (r.status||'').toLowerCase().includes(q)     ||\n        String(r.id).includes(q)\n      ) : this.rows;\n      return [...data].sort((a, b) => {\n        const av = a[this.sortKey] ?? '';\n        const bv = b[this.sortKey] ?? '';\n        return av < bv ? -this.sortDir : av > bv ? this.sortDir : 0;\n      });\n    },\n    totalPages() { return Math.max(1, Math.ceil(this.filtered.length / this.pageSize)); },\n    paginated() { const s = (this.page - 1) * this.pageSize; return this.filtered.slice(s, s + this.pageSize); }\n  },\n  watch: {\n    msg(newMsg) {\n      if (!newMsg) return;\n      if (newMsg.topic === 'table_data') {\n        this.rows = newMsg.payload || [];\n      }\n    },\n    search()   { this.page = 1; },\n    pageSize() { this.page = 1; }\n  },\n  mounted() {\n    this.load();\n  },\n  methods: {\n    load() { this.send({ topic: 'load_table', payload: null }); },\n    sortBy(key) {\n      if (this.sortKey === key) { this.sortDir *= -1; }\n      else { this.sortKey = key; this.sortDir = 1; }\n    },\n    sortIcon(key) { if (this.sortKey !== key) return '⇅'; return this.sortDir === 1 ? '↑' : '↓'; },\n    truncate(str, n) { if (!str) return '—'; return str.length > n ? str.slice(0, n) + '…' : str; },\n    goTo(path) {\n      window.location.href = '/dashboard' + path;\n    }\n  }\n};\n</script>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');\n.records-view * { box-sizing: border-box; margin: 0; padding: 0; }\n.records-view { \n  background: #0a0a0f; \n  color: #c8d8e8; \n  font-family: 'Exo 2', sans-serif; \n  position: fixed; \n  top: 0; left: 0; right: 0; bottom: 0; \n  z-index: 100; \n  padding: 40px 50px; \n  overflow-y: auto; \n  display: flex; \n  flex-direction: column; \n  gap: 20px; \n}\n.records-view::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 39px, #111827 40px); pointer-events: none; opacity: 0.2; }\n.rv-header { display: flex; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 20px; border-bottom: 1px solid #1e2d40; position: relative; z-index: 2; }\n.rv-header-left { flex: 1; display: flex; justify-content: flex-start; }\n.rv-header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 15px; flex-wrap: wrap; }\n.rv-title { flex: 0 0 auto; text-align: center; font-size: 1.8rem; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #e0eaf5; }\n.rv-title span { color: #38bdf8; }\n.btn-nav { background: #0f2035; border: 1px solid #38bdf8; color: #38bdf8; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.15em; padding: 9px 18px; border-radius: 3px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }\n.btn-nav:hover { background: #38bdf8; color: #050d16; box-shadow: 0 0 10px #38bdf866; }\n.rv-search { background: #060d16; border: 1px solid #1a2e44; color: #c8d8e8; padding: 9px 14px; font-family: 'Exo 2', sans-serif; font-size: 0.9rem; border-radius: 3px; outline: none; width: 280px; transition: border-color 0.2s; }\n.rv-search:focus { border-color: #38bdf8; }\n.rv-search::placeholder { color: #2a4060; }\n.rv-refresh { background: transparent; border: 1px solid #1e3a55; color: #38bdf8; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.12em; padding: 9px 16px; border-radius: 3px; cursor: pointer; transition: background 0.2s; }\n.rv-refresh:hover { background: #0f2035; }\n.rv-count { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #3a5a7a; letter-spacing: 0.1em; padding-left: 10px; }\n.rv-table-wrap { overflow-x: auto; flex: 1; position: relative; z-index: 2; background: rgba(10, 14, 26, 0.6); border-radius: 4px; padding: 10px; }\n.rv-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }\n.rv-table thead tr { border-bottom: 2px solid #1e3a55; }\n.rv-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 0.2em; color: #3a5a7a; text-transform: uppercase; padding: 14px 18px; text-align: left; white-space: nowrap; user-select: none; }\n.rv-table th.sortable { cursor: pointer; }\n.rv-table th.sortable:hover { color: #38bdf8; }\n.sort-icon { margin-left: 6px; font-size: 0.75rem; opacity: 0.6; }\n.rv-table tbody tr { border-bottom: 1px solid #0f1a28; transition: background 0.15s; }\n.rv-table tbody tr:hover { background: #0d1a28; }\n.rv-table tbody tr.row-pending    { border-left: 3px solid #f59e0b33; }\n.rv-table tbody tr.row-identified { border-left: 3px solid #38bdf833; }\n.rv-table tbody tr.row-blacklisted { border-left: 3px solid #a855f733; }\n.rv-table tbody tr.row-rejected   { border-left: 3px solid #ef444433; }\n.rv-table td { padding: 14px 18px; color: #8aaac8; vertical-align: middle; }\n.rv-table td.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; }\n.path-cell, .emb-cell { color: #3a5a7a; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.pill { display: inline-block; padding: 4px 12px; border-radius: 3px; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid #1e2d40; color: #555; }\n.pill.pending    { background: #2d1e0088; border-color: #f59e0b66; color: #f59e0b; }\n.pill.identified { background: #00203088; border-color: #38bdf866; color: #38bdf8; }\n.pill.blacklisted { background: #2e106588; border-color: #a855f766; color: #a855f7; }\n.pill.rejected   { background: #20001088; border-color: #ef444466; color: #ef4444; }\n.rv-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; min-height: 350px; color: #2a4060; }\n.rv-empty span { font-size: 3rem; }\n.rv-empty p { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; letter-spacing: 0.1em; }\n.rv-pagination { display: flex; align-items: center; gap: 8px; justify-content: flex-end; padding-top: 15px; border-top: 1px solid #1e2d40; position: relative; z-index: 2; }\n.pg-btn { background: #0f1e2e; border: 1px solid #1e3a55; color: #38bdf8; width: 36px; height: 36px; border-radius: 3px; font-size: 1rem; cursor: pointer; transition: background 0.2s; }\n.pg-btn:hover:not(:disabled) { background: #162840; }\n.pg-btn:disabled { opacity: 0.25; cursor: default; }\n.pg-info { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #3a5a7a; letter-spacing: 0.1em; padding: 0 10px; }\n.pg-size { background: #060d16; border: 1px solid #1a2e44; color: #6b8aaa; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; padding: 6px 10px; border-radius: 3px; margin-left: 12px; cursor: pointer; }\n</style>",
+        "format": "<template>\n  <div class=\"records-view\">\n    <div class=\"rv-header\">\n      <div class=\"rv-header-left\">\n        <button class=\"btn-nav\" @click=\"goTo('/registry')\">&#128247; BACK TO REGISTRY</button>\n      </div>\n      <div class=\"rv-title\">ALL <span>RECORDS</span></div>\n      <div class=\"rv-header-right\">\n        <input class=\"rv-search\" v-model=\"search\" placeholder=\"Search name, status...\" />\n        <button class=\"rv-refresh\" @click=\"load\">&#8635; REFRESH</button>\n        <span class=\"rv-count\">{{ filtered.length }} / {{ rows.length }} rows</span>\n      </div>\n    </div>\n    <div class=\"rv-table-wrap\">\n      <table class=\"rv-table\" v-if=\"rows.length > 0\">\n        <thead>\n          <tr>\n            <th @click=\"sortBy('id')\"         class=\"sortable\">ID     <span class=\"sort-icon\">{{ sortIcon('id') }}</span></th>\n            <th @click=\"sortBy('first_name')\" class=\"sortable\">FIRST  <span class=\"sort-icon\">{{ sortIcon('first_name') }}</span></th>\n            <th @click=\"sortBy('last_name')\"  class=\"sortable\">LAST   <span class=\"sort-icon\">{{ sortIcon('last_name') }}</span></th>\n            <th @click=\"sortBy('status')\"     class=\"sortable\">STATUS <span class=\"sort-icon\">{{ sortIcon('status') }}</span></th>\n            <th>PHOTO PATH</th>\n            <th>EMBEDDING</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr v-for=\"row in paginated\" :key=\"row.id\" :class=\"'row-' + row.status\" @click=\"openModal(row)\" class=\"clickable-row\" title=\"Click to view photo\">\n            <td class=\"mono\">{{ row.id }}</td>\n            <td>{{ row.first_name || '—' }}</td>\n            <td>{{ row.last_name  || '—' }}</td>\n            <td><span class=\"pill\" :class=\"row.status\">{{ row.status }}</span></td>\n            <td class=\"mono path-cell\">{{ truncate(row.photo_path, 38) }}</td>\n            <td class=\"mono emb-cell\" >{{ truncate(row.embedding,  30) }}</td>\n          </tr>\n        </tbody>\n      </table>\n      <div class=\"rv-empty\" v-else><span>&#9711;</span><p>No records found.</p></div>\n    </div>\n    <div class=\"rv-pagination\" v-if=\"totalPages > 1\">\n      <button class=\"pg-btn\" @click=\"page = 1\"          :disabled=\"page === 1\">&#171;</button>\n      <button class=\"pg-btn\" @click=\"page--\"            :disabled=\"page === 1\">&#8249;</button>\n      <span class=\"pg-info\">Page {{ page }} of {{ totalPages }}</span>\n      <button class=\"pg-btn\" @click=\"page++\"            :disabled=\"page === totalPages\">&#8250;</button>\n      <button class=\"pg-btn\" @click=\"page = totalPages\" :disabled=\"page === totalPages\">&#187;</button>\n      <select class=\"pg-size\" v-model=\"pageSize\">\n        <option :value=\"10\">10 / page</option>\n        <option :value=\"25\">25 / page</option>\n        <option :value=\"50\">50 / page</option>\n      </select>\n    </div>\n\n    <!-- MODAL PARA LA IMAGEN -->\n    <div class=\"modal-overlay\" v-if=\"selectedRecord\" @click.self=\"closeModal\">\n      <div class=\"modal-content\">\n        <button class=\"modal-close\" @click=\"closeModal\">&times;</button>\n        <div class=\"modal-header\">\n          <h2>{{ selectedRecord.first_name || 'Unknown' }} {{ selectedRecord.last_name || 'Face' }}</h2>\n          <span class=\"pill\" :class=\"selectedRecord.status\">{{ selectedRecord.status }}</span>\n        </div>\n        <div class=\"modal-body\">\n          <img :src=\"'/faces/' + getFilename(selectedRecord.photo_path)\"\n               @error=\"onImgError($event)\"\n               class=\"modal-img\" />\n        </div>\n        <div class=\"modal-footer mono\">\n          ID: {{ selectedRecord.id }}\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() {\n    return { \n      rows: [], \n      search: '', \n      sortKey: 'id', \n      sortDir: 1, \n      page: 1, \n      pageSize: 10, \n      selectedRecord: null \n    };\n  },\n  computed: {\n    filtered() {\n      const q = this.search.toLowerCase();\n      const data = q ? this.rows.filter(r =>\n        (r.first_name||'').toLowerCase().includes(q) ||\n        (r.last_name||'').toLowerCase().includes(q)  ||\n        (r.status||'').toLowerCase().includes(q)     ||\n        String(r.id).includes(q)\n      ) : this.rows;\n      return [...data].sort((a, b) => {\n        const av = a[this.sortKey] ?? '';\n        const bv = b[this.sortKey] ?? '';\n        return av < bv ? -this.sortDir : av > bv ? this.sortDir : 0;\n      });\n    },\n    totalPages() { return Math.max(1, Math.ceil(this.filtered.length / this.pageSize)); },\n    paginated() { const s = (this.page - 1) * this.pageSize; return this.filtered.slice(s, s + this.pageSize); }\n  },\n  watch: {\n    msg(newMsg) {\n      if (!newMsg) return;\n      if (newMsg.topic === 'table_data') {\n        this.rows = newMsg.payload || [];\n      }\n    },\n    search()   { this.page = 1; },\n    pageSize() { this.page = 1; }\n  },\n  mounted() {\n    this.load();\n    // Cerrar modal con la tecla ESC\n    window.addEventListener('keydown', this.handleKeydown);\n  },\n  unmounted() {\n    window.removeEventListener('keydown', this.handleKeydown);\n  },\n  methods: {\n    load() { this.send({ topic: 'load_table', payload: null }); },\n    sortBy(key) {\n      if (this.sortKey === key) { this.sortDir *= -1; }\n      else { this.sortKey = key; this.sortDir = 1; }\n    },\n    sortIcon(key) { if (this.sortKey !== key) return '⇅'; return this.sortDir === 1 ? '↑' : '↓'; },\n    truncate(str, n) { if (!str) return '—'; return str.length > n ? str.slice(0, n) + '…' : str; },\n    goTo(path) {\n      window.location.href = '/dashboard' + path;\n    },\n    openModal(row) {\n      this.selectedRecord = row;\n    },\n    closeModal() {\n      this.selectedRecord = null;\n    },\n    handleKeydown(e) {\n      if (e.key === 'Escape' && this.selectedRecord) {\n        this.closeModal();\n      }\n    },\n    getFilename(path) {\n      if (!path) return '';\n      return path.replace(/\\\\/g, '/').split('/').pop();\n    },\n    onImgError(e) {\n      e.target.src = 'data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\"><rect fill=\"%23111\" width=\"200\" height=\"200\"/><text x=\"50%\" y=\"50%\" fill=\"%23555\" font-size=\"14\" text-anchor=\"middle\" dy=\".3em\">NO IMAGE</text></svg>';\n    }\n  }\n};\n</script>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');\n.records-view * { box-sizing: border-box; margin: 0; padding: 0; }\n.records-view { \n  background: #0a0a0f; color: #c8d8e8; font-family: 'Exo 2', sans-serif; \n  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; \n  padding: 40px 50px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; \n}\n.records-view::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 39px, #111827 40px); pointer-events: none; opacity: 0.2; }\n.rv-header { display: flex; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 20px; border-bottom: 1px solid #1e2d40; position: relative; z-index: 2; }\n.rv-header-left { flex: 1; display: flex; justify-content: flex-start; }\n.rv-header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 15px; flex-wrap: wrap; }\n.rv-title { flex: 0 0 auto; text-align: center; font-size: 1.8rem; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #e0eaf5; }\n.rv-title span { color: #38bdf8; }\n.btn-nav { background: #0f2035; border: 1px solid #38bdf8; color: #38bdf8; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.15em; padding: 9px 18px; border-radius: 3px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }\n.btn-nav:hover { background: #38bdf8; color: #050d16; box-shadow: 0 0 10px #38bdf866; }\n.rv-search { background: #060d16; border: 1px solid #1a2e44; color: #c8d8e8; padding: 9px 14px; font-family: 'Exo 2', sans-serif; font-size: 0.9rem; border-radius: 3px; outline: none; width: 280px; transition: border-color 0.2s; }\n.rv-search:focus { border-color: #38bdf8; }\n.rv-search::placeholder { color: #2a4060; }\n.rv-refresh { background: transparent; border: 1px solid #1e3a55; color: #38bdf8; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.12em; padding: 9px 16px; border-radius: 3px; cursor: pointer; transition: background 0.2s; }\n.rv-refresh:hover { background: #0f2035; }\n.rv-count { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #3a5a7a; letter-spacing: 0.1em; padding-left: 10px; }\n.rv-table-wrap { overflow-x: auto; flex: 1; position: relative; z-index: 2; background: rgba(10, 14, 26, 0.6); border-radius: 4px; padding: 10px; }\n.rv-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }\n.rv-table thead tr { border-bottom: 2px solid #1e3a55; }\n.rv-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 0.2em; color: #3a5a7a; text-transform: uppercase; padding: 14px 18px; text-align: left; white-space: nowrap; user-select: none; }\n.rv-table th.sortable { cursor: pointer; }\n.rv-table th.sortable:hover { color: #38bdf8; }\n.sort-icon { margin-left: 6px; font-size: 0.75rem; opacity: 0.6; }\n.rv-table tbody tr { border-bottom: 1px solid #0f1a28; transition: background 0.15s; }\n.rv-table tbody tr:hover { background: #0d1a28; }\n.clickable-row { cursor: pointer; }\n.clickable-row:hover td { color: #fff; }\n.rv-table tbody tr.row-pending    { border-left: 3px solid #f59e0b33; }\n.rv-table tbody tr.row-identified { border-left: 3px solid #38bdf833; }\n.rv-table tbody tr.row-blacklisted { border-left: 3px solid #a855f733; }\n.rv-table tbody tr.row-rejected   { border-left: 3px solid #ef444433; }\n.rv-table td { padding: 14px 18px; color: #8aaac8; vertical-align: middle; transition: color 0.2s; }\n.rv-table td.mono { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; }\n.path-cell, .emb-cell { color: #3a5a7a; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.pill { display: inline-block; padding: 4px 12px; border-radius: 3px; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid #1e2d40; color: #555; }\n.pill.pending    { background: #2d1e0088; border-color: #f59e0b66; color: #f59e0b; }\n.pill.identified { background: #00203088; border-color: #38bdf866; color: #38bdf8; }\n.pill.blacklisted { background: #2e106588; border-color: #a855f766; color: #a855f7; }\n.pill.rejected   { background: #20001088; border-color: #ef444466; color: #ef4444; }\n.rv-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; min-height: 350px; color: #2a4060; }\n.rv-empty span { font-size: 3rem; }\n.rv-empty p { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; letter-spacing: 0.1em; }\n.rv-pagination { display: flex; align-items: center; gap: 8px; justify-content: flex-end; padding-top: 15px; border-top: 1px solid #1e2d40; position: relative; z-index: 2; }\n.pg-btn { background: #0f1e2e; border: 1px solid #1e3a55; color: #38bdf8; width: 36px; height: 36px; border-radius: 3px; font-size: 1rem; cursor: pointer; transition: background 0.2s; }\n.pg-btn:hover:not(:disabled) { background: #162840; }\n.pg-btn:disabled { opacity: 0.25; cursor: default; }\n.pg-info { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #3a5a7a; letter-spacing: 0.1em; padding: 0 10px; }\n.pg-size { background: #060d16; border: 1px solid #1a2e44; color: #6b8aaa; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; padding: 6px 10px; border-radius: 3px; margin-left: 12px; cursor: pointer; }\n\n/* MODAL STYLES */\n.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(4px); }\n.modal-content { background: #0a0a0f; border: 1px solid #1e2d40; border-radius: 4px; padding: 25px; position: relative; max-width: 400px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }\n.modal-close { position: absolute; top: 12px; right: 15px; background: transparent; border: none; color: #6b8aaa; font-size: 1.8rem; cursor: pointer; transition: color 0.2s; }\n.modal-close:hover { color: #ef4444; }\n.modal-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding-right: 20px; }\n.modal-header h2 { font-size: 1.4rem; margin: 0; color: #e0eaf5; text-transform: uppercase; font-family: 'Exo 2', sans-serif; }\n.modal-img { width: 100%; height: auto; max-height: 400px; object-fit: cover; border-radius: 3px; border: 1px solid #1e2d40; display: block; }\n.modal-footer { margin-top: 15px; font-size: 0.75rem; color: #3a5a7a; text-align: center; }\n</style>",
         "storeOutMessages": true,
         "passthru": true,
         "resendOnRefresh": true,
         "templateScope": "widget:page",
         "className": "",
-        "x": 350,
-        "y": 1000,
+        "x": 360,
+        "y": 1200,
         "wires": [
             [
                 "61e4987886f684d8"
+            ]
+        ]
+    },
+    {
+        "id": "d265777c9b809965",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Local Database",
+        "x": 650,
+        "y": 260,
+        "wires": [
+            [
+                "b7a0caa963dc0433"
+            ]
+        ]
+    },
+    {
+        "id": "1be746a37ebb9182",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Insert New Face",
+        "x": 680,
+        "y": 900,
+        "wires": [
+            [
+                "2c81241b3b7a13c9"
+            ]
+        ]
+    },
+    {
+        "id": "7d9fc92e9a40898d",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Query All Faces",
+        "x": 960,
+        "y": 1000,
+        "wires": [
+            [
+                "1952005aed97c097"
+            ]
+        ]
+    },
+    {
+        "id": "daf29bb83d95b5b0",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Update Face Record",
+        "x": 960,
+        "y": 1080,
+        "wires": [
+            [
+                "8e645c08d5a3df8d"
+            ]
+        ]
+    },
+    {
+        "id": "9a758571dcfeeb0d",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "Query All Columns",
+        "x": 960,
+        "y": 1200,
+        "wires": [
+            [
+                "e28d2c79b8d0f57a"
+            ]
+        ]
+    },
+    {
+        "id": "check_db_sqlite",
+        "type": "queuedsqlite",
+        "z": "b31915b6cc494042",
+        "mydb": "686b413b27a3785d",
+        "sqlquery": "msg.topic",
+        "dbName": "msg.database",
+        "db": "",
+        "sql": "",
+        "name": "2. Get Saved Faces",
+        "x": 390,
+        "y": 720,
+        "wires": [
+            [
+                "681eed3bcfb276b8"
+            ]
+        ]
+    },
+    {
+        "id": "dfee6fba2a7a8fc9",
+        "type": "OPCUA-IIoT-Listener",
+        "z": "b31915b6cc494042",
+        "connector": "c6a66b5d3bc08639",
+        "action": "subscribe",
+        "queueSize": 10,
+        "name": "",
+        "topic": "",
+        "justValue": true,
+        "useGroupItems": false,
+        "showStatusActivities": false,
+        "showErrors": false,
+        "x": 380,
+        "y": 560,
+        "wires": [
+            [
+                "509c91c6c45ad3a0"
+            ]
+        ]
+    },
+    {
+        "id": "1ded2cac2645a370",
+        "type": "OPCUA-IIoT-Inject",
+        "z": "b31915b6cc494042",
+        "injectType": "listen",
+        "payload": "60",
+        "payloadType": "num",
+        "topic": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "startDelay": "",
+        "name": "",
+        "addressSpaceItems": [
+            {
+                "name": "RPI",
+                "nodeId": "ns=4;s=MAIN.aImageRxBuffer",
+                "datatypeName": ""
+            },
+            {
+                "name": "",
+                "nodeId": "ns=4;s=MAIN.stSystem.inputs.iFacialDetec",
+                "datatypeName": ""
+            }
+        ],
+        "x": 110,
+        "y": 560,
+        "wires": [
+            [
+                "dfee6fba2a7a8fc9"
+            ]
+        ]
+    },
+    {
+        "id": "509c91c6c45ad3a0",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Extract Bytes From OPC UA",
+        "func": "// 1. Navegamos por la estructura\nif (!msg.payload || !msg.payload.value || !msg.payload.value.value || msg.payload.value.value.value === undefined) {\n    node.error(\"Estructura OPC UA no válida\");\n    return null;\n}\n\nlet rawData = msg.payload.value.value.value;\nlet dataArray = [];\n\n// 2. EXTRACCIÓN A PRUEBA DE BOMBAS\n// Filtramos según el formato en el que OPC UA haya escupido el buffer\nif (Buffer.isBuffer(rawData)) {\n    dataArray = Array.from(rawData);\n} else if (Array.isArray(rawData)) {\n    dataArray = rawData;\n} else if (rawData.data && Array.isArray(rawData.data)) {\n    // Formato de Buffer serializado { type: 'Buffer', data: [255, 216...] }\n    dataArray = rawData.data;\n} else if (typeof rawData === 'object') {\n    // Formato de Diccionario o TypedArray {\"0\": 255, \"1\": 216...}\n    if (rawData.length !== undefined) {\n        dataArray = Array.from(rawData);\n    } else {\n        dataArray = Object.values(rawData);\n    }\n}\n\n// Chivato por si acaso\nif (dataArray.length === 0) {\n    node.warn(\"El array está vacío. El formato raro recibido es: \" + typeof rawData);\n    return null;\n}\n\n// 3. BUSCAR EL FINAL DEL JPG (FF D9 -> 255 217)\nlet endIndex = dataArray.length;\n\nfor (let i = 0; i < dataArray.length - 1; i++) {\n    // El & 0xFF convierte los SInt (bytes con signo como -1) a USInt (255) mágicamente\n    let byte1 = dataArray[i] & 0xFF;\n    let byte2 = dataArray[i+1] & 0xFF;\n\n    if (byte1 === 255 && byte2 === 217) {\n        endIndex = i + 2; \n        break; \n    }\n}\n\n// 4. Recortamos la basura (los ceros del PLC) y lo pasamos al formato exacto de Flask\nlet byteDict = {};\nfor(let i = 0; i < endIndex; i++) {\n    byteDict[i] = dataArray[i] & 0xFF;\n}\n\n// Sobrescribimos el payload y lo enviamos al nodo HTTP Request\nmsg.payload = { image_bytes: byteDict };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 560,
+        "wires": [
+            [
+                "1ce8cc543c06cadc"
+            ]
+        ]
+    },
+    {
+        "id": "exec_pm2",
+        "type": "exec",
+        "z": "b31915b6cc494042",
+        "command": "cmd.exe /c ",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Start/Restart PM2 API",
+        "x": 400,
+        "y": 80,
+        "wires": [
+            [
+                "c57087b0ff335bce"
+            ],
+            [
+                "80d02e62d364edf2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "ace498930db31820",
+        "type": "inject",
+        "z": "b31915b6cc494042",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 100,
+        "wires": [
+            [
+                "2fea4c1170ec2f8d"
+            ]
+        ]
+    },
+    {
+        "id": "c57087b0ff335bce",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "PM2 Log",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "$string(payload)",
+        "targetType": "jsonata",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "80d02e62d364edf2",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "PM2 Error",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "$string(payload)",
+        "targetType": "jsonata",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "2fea4c1170ec2f8d",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Auto-Install & Boot API",
+        "func": "const userDir = env.get(\"USERPROFILE\") || \"C:\";\nconst projectDir = userDir + \"\\\\.node-red\\\\projects\\\\face-registration-system\";\nconst weightsDir = userDir + \"\\\\.deepface\\\\weights\";\nconst weightsFile = weightsDir + \"\\\\facenet_weights.h5\";\nconst weightsUrl = \"https://github.com/serengil/deepface_models/releases/download/v1.0/facenet_weights.h5\";\n\n// 1. SIN PARÉNTESIS y usando 'call' para que NPM no se trague caracteres extraños\nlet cmd = `where pm2 >nul 2>nul || call npm install -g pm2`;\n\n// 2. Pre-descarga del modelo Facenet de DeepFace\ncmd += ` && if not exist \"${weightsDir}\" mkdir \"${weightsDir}\"`;\ncmd += ` && if not exist \"${weightsFile}\" curl -# -L -o \"${weightsFile}\" \"${weightsUrl}\"`;\n\n// 3. Arranque del backend\ncmd += ` && cd \"${projectDir}\"`;\n\n// 4. PIP install (también sin paréntesis para no tentar a la suerte)\ncmd += ` && if exist requirements.txt pip install -r requirements.txt`;\n\n// 5. PM2 con 'call' para evitar que Windows rompa la cadena\ncmd += ` && call pm2 restart face-api || call pm2 start api.py --name face-api --interpreter python`;\n\nmsg.payload = cmd;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 20,
+        "wires": [
+            [
+                "exec_pm2"
+            ]
+        ]
+    },
+    {
+        "id": "f8b7ff80db0eab99",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "1. Save Data & Query DB",
+        "func": "msg.new_face = msg.payload;\n\nif (msg.payload.status !== 'success') {\n    return null;\n}\n\nconst userDir = env.get(\"USERPROFILE\") || \"C:\";\nmsg.database = userDir + \"/saved_faces/face_data.db\";\n\n// AÑADIDO: Ahora también pedimos la columna 'status' de golpe\nmsg.topic = \"SELECT id, embedding, status FROM persons WHERE embedding IS NOT NULL AND embedding != ''\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 150,
+        "y": 720,
+        "wires": [
+            [
+                "check_db_sqlite"
+            ]
+        ]
+    },
+    {
+        "id": "681eed3bcfb276b8",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "3. Compare Embeddings",
+        "func": "const existingFaces = msg.payload;\nconst newEmbedding = msg.new_face.embedding;\n\nconst THRESHOLD = 0.40; \n\nfunction cosineDistance(vecA, vecB) {\n    let dotProduct = 0;\n    let normA = 0;\n    let normB = 0;\n    \n    for (let i = 0; i < vecA.length; i++) {\n        dotProduct += vecA[i] * vecB[i];\n        normA += vecA[i] * vecA[i];\n        normB += vecB[i] * vecB[i];\n    }\n    \n    if (normA === 0 || normB === 0) return 1; \n    \n    return 1 - (dotProduct / (Math.sqrt(normA) * Math.sqrt(normB)));\n}\n\nlet isDuplicate = false;\nlet matchedId = null;\nlet matchedStatus = null; // Variable nueva para guardar el estado\n\nfor (let face of existingFaces) {\n    try {\n        let dbEmbedding = JSON.parse(face.embedding);\n        let distance = cosineDistance(newEmbedding, dbEmbedding);\n        \n        if (distance < THRESHOLD) {\n            isDuplicate = true;\n            matchedId = face.id;\n            matchedStatus = face.status; // Extraemos el estado de la DB en el acto\n            break; \n        }\n    } catch(e) {}\n}\n\nmsg.payload = msg.new_face;\nmsg.match_info = {\n    isDuplicate: isDuplicate,\n    matchedId: matchedId,\n    matchedStatus: matchedStatus // Lo pasamos al siguiente nodo\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 720,
+        "wires": [
+            [
+                "branch_duplicate"
+            ]
+        ]
+    },
+    {
+        "id": "12483c9c542d83d7",
+        "type": "OPCUA-IIoT-Write",
+        "z": "b31915b6cc494042",
+        "connector": "c6a66b5d3bc08639",
+        "name": "Trigger iFacialDetec",
+        "justValue": false,
+        "showStatusActivities": false,
+        "showErrors": true,
+        "x": 1600,
+        "y": 720,
+        "wires": [
+            [
+                "bbc576ab14f8a4e2"
+            ]
+        ]
+    },
+    {
+        "id": "bbc576ab14f8a4e2",
+        "type": "debug",
+        "z": "b31915b6cc494042",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1810,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "check_blacklisted",
+        "type": "function",
+        "z": "b31915b6cc494042",
+        "name": "Is Blacklisted?",
+        "func": "// 1. Normalizamos el texto de SQLite\nlet currentStatus = (msg.match_info.matchedStatus || \"\").toString().trim().toLowerCase();\n\nif (currentStatus === 'blacklisted') {\n    // 2. LA OPCIÓN NUCLEAR: Le damos TODO mascado al nodo OPC UA Write\n    // Definimos qué variable es Y su valor exacto en el mismo paquete.\n    msg.payload = {\n        injectType: \"write\",\n        addressSpaceItems: [\n            {\n                name: \"Detec_Alert\",\n                nodeId: \"ns=4;s=MAIN.stSystem.inputs.iFacialDetec\",\n                datatypeName: \"Boolean\"\n            }\n        ],\n        valuesToWrite: [true]\n    };\n    \n    return msg;\n}\n\n// Si no es blacklisted, detenemos el flujo\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 780,
+        "wires": [
+            [
+                "12483c9c542d83d7"
             ]
         ]
     }

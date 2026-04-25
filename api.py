@@ -3,6 +3,12 @@ from deepface import DeepFace
 import base64
 import os
 import uuid
+import sys
+import io
+
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 app = Flask(__name__)
 
@@ -56,4 +62,4 @@ def process_image():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5005)
